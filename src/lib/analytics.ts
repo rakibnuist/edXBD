@@ -1,0 +1,444 @@
+// Analytics and tracking utilities for EduExpress International
+
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+    fbq: (action: string, event?: string, parameters?: Record<string, unknown>) => void;
+    dataLayer: unknown[];
+  }
+}
+
+// Configuration
+export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX';
+export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1234567890';
+export const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || '';
+
+// Initialize GTM
+export const initGTM = () => {
+  if (typeof window !== 'undefined' && GTM_ID !== 'GTM-XXXXXXX') {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
+    };
+    window.gtag('js', new Date());
+    window.gtag('config', GTM_ID);
+  }
+};
+
+// Initialize Meta Pixel
+export const initMetaPixel = () => {
+  if (typeof window !== 'undefined' && META_PIXEL_ID && META_PIXEL_ID !== '1234567890') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    
+    w.fbq = w.fbq || function(...args: unknown[]) {
+      if (w.fbq.callMethod) {
+        w.fbq.callMethod(...args);
+      } else {
+        w.fbq.queue = w.fbq.queue || [];
+        w.fbq.queue.push(args);
+      }
+    };
+    
+    w.fbq.queue = w.fbq.queue || [];
+    
+    if (!w.fbq.loaded) {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+      document.head.appendChild(script);
+      w.fbq.loaded = true;
+    }
+    
+    w.fbq('init', META_PIXEL_ID);
+    w.fbq('track', 'PageView');
+  }
+};
+
+// Generate unique event ID for deduplication
+const generateEventId = (): string => {
+  return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
+// Track events
+export const trackEvent = (eventName: string, parameters?: Record<string, unknown>) => {
+  const eventId = generateEventId();
+  const eventData = {
+    event_id: eventId,
+    ...parameters
+  };
+
+  // GTM tracking
+  if (typeof window !== 'undefined' && window.gtag && GTM_ID !== 'GTM-XXXXXXX') {
+    try {
+      window.gtag('event', eventName, {
+        event_category: 'engagement',
+        event_label: parameters?.label || '',
+        value: parameters?.value || 0,
+        event_id: eventId,
+        ...parameters
+      });
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+
+  // Meta Pixel tracking
+  if (typeof window !== 'undefined' && window.fbq && META_PIXEL_ID && META_PIXEL_ID !== '1234567890') {
+    try {
+      window.fbq('track', eventName, eventData);
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+
+  return eventId;
+};
+
+// Education-specific tracking functions
+export const trackConsultationRequest = (source: string = 'website') => {
+  trackEvent('Lead', {
+    event_category: 'consultation',
+    event_label: 'consultation_request',
+    source: source,
+    content_name: 'Free Consultation',
+    content_category: 'Lead Generation'
+  });
+};
+
+export const trackFormSubmission = (formType: string, formData?: Record<string, unknown>) => {
+  trackEvent('CompleteRegistration', {
+    event_category: 'form',
+    event_label: `${formType}_submission`,
+    content_name: `${formType} Form`,
+    content_category: 'Form Submission',
+    ...formData
+  });
+};
+
+export const trackPhoneClick = (phoneNumber: string) => {
+  trackEvent('Contact', {
+    event_category: 'contact',
+    event_label: 'phone_click',
+    content_name: 'Phone Contact',
+    phone_number: phoneNumber
+  });
+};
+
+export const trackEmailClick = (email: string) => {
+  trackEvent('Contact', {
+    event_category: 'contact',
+    event_label: 'email_click',
+    content_name: 'Email Contact',
+    email: email
+  });
+};
+
+export const trackWhatsAppClick = (source: string) => {
+  trackEvent('Contact', {
+    event_category: 'whatsapp',
+    event_label: 'whatsapp_click',
+    content_name: 'WhatsApp Contact',
+    source: source
+  });
+};
+
+export const trackPageView = (pageName: string, pageCategory?: string) => {
+  trackEvent('page_view', {
+    page_title: pageName,
+    page_category: pageCategory || 'general',
+    page_location: typeof window !== 'undefined' ? window.location.href : ''
+  });
+};
+
+export const trackCountryInterest = (country: string) => {
+  trackEvent('ViewContent', {
+    event_category: 'interest',
+    event_label: 'country_view',
+    content_name: `Study in ${country}`,
+    content_category: 'Country Interest',
+    custom_parameter_1: country
+  });
+};
+
+// Meta Conversion API Functions
+export const sendConversionAPIEvent = async (
+  eventName: string,
+  userData: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  customData?: Record<string, unknown>,
+  eventId?: string
+) => {
+  if (!META_ACCESS_TOKEN || !META_PIXEL_ID) {
+    return;
+  }
+
+  try {
+    const eventData = {
+      data: [
+        {
+          event_name: eventName,
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: eventId || generateEventId(),
+          user_data: {
+            em: userData.email ? [await hashData(userData.email)] : undefined,
+            ph: userData.phone ? [await hashData(userData.phone)] : undefined,
+            fn: userData.firstName ? [await hashData(userData.firstName)] : undefined,
+            ln: userData.lastName ? [await hashData(userData.lastName)] : undefined,
+            client_ip_address: await getClientIP(),
+            client_user_agent: typeof window !== 'undefined' ? navigator.userAgent : '',
+          },
+          custom_data: customData,
+          event_source_url: typeof window !== 'undefined' ? window.location.href : '',
+          action_source: 'website',
+        },
+      ],
+      access_token: META_ACCESS_TOKEN,
+    };
+
+    const response = await fetch('https://graph.facebook.com/v18.0/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Meta Conversion API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Meta Conversion API error:', error);
+    throw error;
+  }
+};
+
+// Hash data for Meta Conversion API
+const hashData = async (data: string): Promise<string> => {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data.toLowerCase().trim());
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  } else {
+    // Fallback for environments without Web Crypto API
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+  }
+};
+
+// Get client IP address
+const getClientIP = async (): Promise<string> => {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch {
+    return '127.0.0.1';
+  }
+};
+
+// Enhanced lead tracking with Conversion API
+export const trackStudyAbroadLead = async (
+  formData: {
+    name: string;
+    email: string;
+    phone: string;
+    country: string;
+    program?: string;
+    message?: string;
+  },
+  source: string = 'website_contact_form'
+) => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = formData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: formData.email,
+    phone: formData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: formData.country
+  };
+
+  const customData = {
+    content_name: 'Study Abroad Consultation Form',
+    content_category: 'Education Lead Generation',
+    source: source,
+    study_destination: formData.country,
+    program_interest: formData.program || 'not_specified',
+    has_message: !!formData.message,
+    lead_value: 50,
+    currency: 'USD'
+  };
+
+  // Track with GTM
+  trackEvent('study_abroad_lead', {
+    event_category: 'conversion',
+    event_label: 'lead_generated',
+    value: 50,
+    event_id: eventId,
+    ...customData
+  });
+
+  // Track with Meta Pixel
+  if (typeof window !== 'undefined' && window.fbq && META_PIXEL_ID && META_PIXEL_ID !== '1234567890') {
+    try {
+      window.fbq('track', 'Lead', {
+        value: 50,
+        event_id: eventId,
+        ...customData
+      });
+    } catch (error) {
+      // Silent error handling
+    }
+  }
+
+  // Track with Conversion API
+  await sendConversionAPIEvent('Lead', userData, customData, eventId);
+};
+
+// Additional analytics functions for admin dashboard
+export const trackDashboardView = (dashboardType: string) => {
+  trackEvent('dashboard_view', {
+    event_category: 'admin',
+    event_label: 'dashboard_view',
+    dashboard_type: dashboardType
+  });
+};
+
+export const trackDashboardAction = (action: string, parameters?: Record<string, unknown>) => {
+  trackEvent('dashboard_action', {
+    event_category: 'admin',
+    event_label: 'dashboard_action',
+    action: action,
+    ...parameters
+  });
+};
+
+export const trackDatabaseOperation = (operation: string, success: boolean, parameters?: Record<string, unknown>) => {
+  trackEvent('database_operation', {
+    event_category: 'admin',
+    event_label: 'database_operation',
+    operation: operation,
+    success: success,
+    ...parameters
+  });
+};
+
+export const trackAdminEngagement = (engagementType: string, parameters?: Record<string, unknown>) => {
+  trackEvent('admin_engagement', {
+    event_category: 'admin',
+    event_label: 'admin_engagement',
+    engagement_type: engagementType,
+    ...parameters
+  });
+};
+
+// Form tracking functions
+export const trackFormStart = (formType: string) => {
+  trackEvent('form_start', {
+    event_category: 'form',
+    event_label: 'form_start',
+    form_type: formType
+  });
+};
+
+export const trackFormFieldFocus = (fieldName: string, formType: string) => {
+  trackEvent('form_field_focus', {
+    event_category: 'form',
+    event_label: 'form_field_focus',
+    field_name: fieldName,
+    form_type: formType
+  });
+};
+
+export const trackFormFieldComplete = (fieldName: string, formType: string) => {
+  trackEvent('form_field_complete', {
+    event_category: 'form',
+    event_label: 'form_field_complete',
+    field_name: fieldName,
+    form_type: formType
+  });
+};
+
+export const trackFormAbandonment = (formType: string, fieldsCompleted: number) => {
+  trackEvent('form_abandonment', {
+    event_category: 'form',
+    event_label: 'form_abandonment',
+    form_type: formType,
+    fields_completed: fieldsCompleted
+  });
+};
+
+export const trackStudyAbroadFormSubmission = (formData: Record<string, unknown>) => {
+  trackEvent('study_abroad_form_submission', {
+    event_category: 'conversion',
+    event_label: 'study_abroad_form_submission',
+    ...formData
+  });
+};
+
+export const trackFormValidationError = (fieldName: string, errorType: string, formType: string) => {
+  trackEvent('form_validation_error', {
+    event_category: 'form',
+    event_label: 'form_validation_error',
+    field_name: fieldName,
+    error_type: errorType,
+    form_type: formType
+  });
+};
+
+// Content management tracking function
+export const trackContentManagement = (action: string, parameters?: Record<string, unknown>) => {
+  trackEvent('content_management', {
+    event_category: 'admin',
+    event_label: 'content_management',
+    action: action,
+    ...parameters
+  });
+};
+
+// Application start tracking function
+export const trackApplicationStart = (source: string = 'homepage') => {
+  trackEvent('application_start', {
+    event_category: 'conversion',
+    event_label: 'application_start',
+    source: source,
+    content_name: 'Study Abroad Application',
+    content_category: 'Application Start'
+  });
+};
+
+// Lead management tracking function
+export const trackLeadManagement = (action: string, parameters?: Record<string, unknown>) => {
+  trackEvent('lead_management', {
+    event_category: 'admin',
+    event_label: 'lead_management',
+    action: action,
+    ...parameters
+  });
+};
+
+// Testimonial management tracking function
+export const trackTestimonialManagement = (action: string, parameters?: Record<string, unknown>) => {
+  trackEvent('testimonial_management', {
+    event_category: 'admin',
+    event_label: 'testimonial_management',
+    action: action,
+    ...parameters
+  });
+};

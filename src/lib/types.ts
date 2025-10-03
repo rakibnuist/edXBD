@@ -1,0 +1,178 @@
+// Shared interfaces to eliminate duplicates across the application
+
+export interface Testimonial {
+  _id: string;
+  name: string;
+  location: string;
+  university: string;
+  program: string;
+  quote: string;
+  rating: number;
+  image?: string;
+  country: string;
+  isActive: boolean;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Update {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  metaDescription?: string;
+  category?: string;
+  tags?: string[];
+  featuredImage?: string;
+  isFeatured: boolean;
+  author: string;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdatesResponse {
+  updates: Update[];
+  totalCount: number;
+  categories: string[];
+  authors: string[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface University {
+  name: string;
+  ranking: string;
+  globalRanking?: string;
+  programs: string[];
+  location?: string;
+  founded?: string;
+  students?: string;
+  description?: string;
+  logo?: string;
+}
+
+export interface Scholarship {
+  name: string;
+  amount: string;
+  coverage: string[];
+  eligibility: string[];
+  deadline: string;
+}
+
+export interface Lead {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  program: string;
+  message?: string;
+  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'closed';
+  source: string;
+  assignedTo?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Content {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  type: string;
+  category?: string;
+  excerpt?: string;
+  featuredImage?: string;
+  isPublished: boolean;
+  isFeatured: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
+  tags?: string[];
+  categories?: string[];
+  author: string;
+  publishedAt?: string;
+  views: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Country {
+  _id: string;
+  name: string;
+  slug: string;
+  flag: string;
+  description: string;
+  universities: string[];
+  programs: string[];
+  requirements: {
+    language: string[];
+    documents: string[];
+    visa: string[];
+  };
+  costs: {
+    tuition: string;
+    living: string;
+    currency: string;
+  };
+  scholarships: string[];
+  isActive: boolean;
+  featured: boolean;
+  images: string[];
+  metaTitle?: string;
+  metaDescription?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  totalLeads: number;
+  newLeads: number;
+  totalTestimonials: number;
+  totalCountries: number;
+  recentLeads: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    country: string;
+    program: string;
+    status: string;
+    createdAt: string;
+  }>;
+}
+
+// Common page props
+export interface PageProps {
+  params: Promise<{
+    [key: string]: string;
+  }>;
+}
+
+export interface CountryPageProps extends PageProps {
+  params: Promise<{
+    country: string;
+  }>;
+}
+
+export interface UpdatePageProps extends PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+// Component props
+export interface ConsultationButtonProps {
+  text: string;
+  className?: string;
+  source: string;
+}
+
+export interface UpdateClientProps {
+  update: Update;
+}

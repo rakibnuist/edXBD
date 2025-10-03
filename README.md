@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EduExpress International - Website
 
-## Getting Started
+A modern, responsive website for EduExpress International built with Next.js, TypeScript, and Tailwind CSS. Based on the Executive Study Abroad website design with complete rebranding.
 
-First, run the development server:
+## 🌟 Features
 
+- **Responsive Design**: Fully responsive across all device sizes
+- **Modern UI/UX**: Clean, professional design with smooth animations
+- **TypeScript**: Type-safe development with full TypeScript support
+- **Tailwind CSS**: Utility-first CSS framework for rapid styling
+- **Component-Based**: Reusable React components for maintainability
+- **SEO Optimized**: Proper meta tags and semantic HTML structure
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd edxbd
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+## 📁 Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── layout.tsx          # Root layout component
+│   ├── page.tsx           # Homepage
+│   └── globals.css        # Global styles
+├── components/
+│   ├── Header.tsx         # Navigation header
+│   ├── Footer.tsx         # Footer component
+│   ├── CountryCard.tsx    # Country study cards
+│   ├── TestimonialCard.tsx # Student testimonials
+│   ├── EventCard.tsx      # Event cards
+│   └── StatCard.tsx       # Statistics cards
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Design Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Homepage Sections
 
-## Deploy on Vercel
+1. **Hero Section**: Eye-catching banner with call-to-action buttons
+2. **Country Cards**: Interactive cards for different study destinations
+3. **Features Section**: Key benefits (scholarships, consultations, experience)
+4. **University Partners**: Showcase of partner institutions
+5. **How We Work**: 3-step process explanation
+6. **Statistics**: Key numbers and achievements
+7. **Events**: Upcoming study abroad events
+8. **Testimonials**: Student success stories
+9. **News & Updates**: Latest company news
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Interactive Elements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Responsive Navigation**: Mobile-friendly hamburger menu
+- **Hover Effects**: Smooth animations on cards and buttons
+- **Dropdown Menus**: Country and services navigation
+- **Contact Information**: Multiple contact methods displayed
+- **Newsletter Signup**: Email subscription form
+
+## 🛠️ Technologies Used
+
+- **Next.js 15**: React framework with App Router
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first CSS framework
+- **Lucide React**: Modern icon library
+- **ESLint**: Code linting and formatting
+
+## 📱 Responsive Breakpoints
+
+- **Mobile**: < 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: > 1024px
+
+## 🎯 Key Components
+
+### Header Component
+- Sticky navigation with contact information
+- Responsive mobile menu
+- Dropdown menus for countries and services
+- Call-to-action button
+
+### Footer Component
+- Company addresses and contact details
+- Sitemap navigation
+- Newsletter subscription
+- Social media integration ready
+
+### Country Cards
+- Interactive hover effects
+- Gradient backgrounds
+- Call-to-action links
+- Responsive grid layout
+
+### Testimonial Cards
+- Star ratings display
+- Student photos placeholders
+- Responsive testimonial grid
+- Google reviews integration ready
+
+## 🚀 Deployment
+
+The project is ready for deployment on platforms like:
+
+- **Vercel** (recommended for Next.js)
+- **Netlify**
+- **AWS Amplify**
+- **Railway**
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## 📄 License
+
+This project is created as a clone for educational/demonstration purposes.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📞 Support
+
+For questions or support regarding this clone implementation, please open an issue in the repository.
+
+---
+
+**Note**: This website is designed for EduExpress International, a fictional education consultancy company. The design is inspired by Executive Study Abroad but completely rebranded with new content, contact information, and testimonials.
