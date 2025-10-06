@@ -280,16 +280,13 @@ export const trackStudyAbroadLead = async (
     source: source,
     study_destination: formData.country,
     program_interest: formData.program || 'not_specified',
-    has_message: !!formData.message,
-    lead_value: 50,
-    currency: 'USD'
+    has_message: !!formData.message
   };
 
   // Track with GTM
   trackEvent('study_abroad_lead', {
     event_category: 'conversion',
     event_label: 'lead_generated',
-    value: 50,
     event_id: eventId,
     ...customData
   });
@@ -298,7 +295,6 @@ export const trackStudyAbroadLead = async (
   if (typeof window !== 'undefined' && window.fbq && META_PIXEL_ID && META_PIXEL_ID !== '1234567890') {
     try {
       window.fbq('track', 'Lead', {
-        value: 50,
         event_id: eventId,
         ...customData
       });

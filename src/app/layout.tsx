@@ -1,72 +1,31 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Space_Grotesk, Outfit, DM_Sans, Caveat, Dancing_Script, Kalam, Amatic_SC } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import Analytics from "@/components/Analytics";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuickContactForm from "@/components/QuickContactForm";
+import ConditionalHeader from "@/components/ConditionalHeader";
+import ConditionalMain from "@/components/ConditionalMain";
+import PageTransition from "@/components/PageTransition";
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
+// Primary font for body text and UI elements
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  display: "swap",
-});
-
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+// Elegant serif font for headings and special text
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const caveat = Caveat({
-  variable: "--font-caveat",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const dancingScript = Dancing_Script({
-  variable: "--font-dancing-script",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const kalam = Kalam({
-  variable: "--font-kalam",
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
-  display: "swap",
-});
-
-const amaticSC = Amatic_SC({
-  variable: "--font-amatic-sc",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.eduexpressint.com'),
@@ -270,6 +229,27 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        
+        {/* Font Preloading for Performance */}
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          as="style"
+        />
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"
+          as="style"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"
+        />
+        
         <meta name="geo.region" content="BD-DH" />
         <meta name="geo.placename" content="Dhaka" />
         <meta name="geo.position" content="23.8103;90.4125" />
@@ -282,15 +262,19 @@ export default function RootLayout({
         <meta name="MobileOptimized" content="320" />
       </head>
       <body
-        className={`${inter.variable} ${poppins.variable} ${spaceGrotesk.variable} ${outfit.variable} ${dmSans.variable} ${caveat.variable} ${dancingScript.variable} ${kalam.variable} ${amaticSC.variable} antialiased`}
+        className={`${inter.variable} ${playfairDisplay.variable} antialiased`}
+        style={{ marginTop: 0 }}
       >
         <Analytics />
-        <Header />
-        <main className="pt-16 sm:pt-20 md:pt-24">
-          {children}
-        </main>
+        <ConditionalHeader />
+        <ConditionalMain>
+          <PageTransition>
+            {children}
+          </PageTransition>
+        </ConditionalMain>
         <Footer />
         <QuickContactForm />
+        <ScrollToTop />
       </body>
     </html>
   );

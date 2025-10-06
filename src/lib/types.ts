@@ -131,17 +131,104 @@ export interface Country {
   updatedAt: string;
 }
 
+export interface Partnership {
+  _id: string;
+  // Company Information
+  companyName?: string;
+  businessType: 'individual' | 'consultancy' | 'agency' | 'institution' | 'other';
+  businessRegistrationNumber?: string;
+  businessLicense?: string;
+  website?: string;
+  yearsInBusiness: number;
+  
+  // Contact Information
+  contactPerson: string;
+  email: string;
+  phone: string;
+  alternatePhone?: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  
+  // Business Details
+  partnershipType: 'individual_agent' | 'company';
+  targetCountries: string[];
+  currentClients: number;
+  monthlyTarget: number;
+  experience: string;
+  currentPartners?: string[];
+  
+  // Financial Information
+  annualRevenue?: string;
+  investmentCapacity: string;
+  expectedCommission: string;
+  
+  // Marketing & Network
+  marketingChannels: string[];
+  socialMediaPresence: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  localNetwork: string;
+  referralSources: string[];
+  
+  // Documents
+  documents: {
+    businessLicense?: string;
+    taxCertificate?: string;
+    bankStatement?: string;
+    identityProof?: string;
+    portfolio?: string;
+  };
+  
+  // Additional Information
+  motivation: string;
+  expectations: string;
+  additionalInfo?: string;
+  
+  // Status & Management
+  status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold';
+  priority: 'low' | 'medium' | 'high';
+  assignedTo?: string;
+  reviewNotes?: string;
+  followUpDate?: string;
+  
+  // System Fields
+  source: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DashboardStats {
   totalLeads: number;
   newLeads: number;
   totalTestimonials: number;
   totalCountries: number;
+  totalPartnerships: number;
+  newPartnerships: number;
   recentLeads: Array<{
     _id: string;
     name: string;
     email: string;
     country: string;
     program: string;
+    status: string;
+    createdAt: string;
+  }>;
+  recentPartnerships: Array<{
+    _id: string;
+    companyName: string;
+    contactPerson: string;
+    email: string;
+    country: string;
+    partnershipType: string;
     status: string;
     createdAt: string;
   }>;

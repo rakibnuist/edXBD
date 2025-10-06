@@ -59,127 +59,28 @@ export const metadata: Metadata = {
   },
 };
 
-interface University {
-  name: string;
-  ranking: string;
-  globalRanking: string;
-  programs: string[];
-  location: string;
-  founded: string;
-  students: string;
-  description: string;
-  logo?: string;
-}
 
-interface Scholarship {
-  name: string;
-  amount: string;
-  coverage: string[];
-  eligibility: string[];
-  deadline: string;
-}
-
-const universities: University[] = [
-  {
-    name: 'Tsinghua University',
-    ranking: '1st in China',
-    globalRanking: 'QS World Ranking: 14th',
-    programs: ['Engineering', 'Business', 'Computer Science', 'Medicine', 'Architecture', 'Economics'],
-    location: 'Beijing',
-    founded: '1911',
-    students: '50,000+',
-    description: 'China\'s most prestigious university, known for engineering and technology excellence.'
-  },
-  {
-    name: 'Peking University',
-    ranking: '2nd in China',
-    globalRanking: 'QS World Ranking: 12th',
-    programs: ['Arts', 'Sciences', 'Medicine', 'Business', 'Law', 'International Relations'],
-    location: 'Beijing',
-    founded: '1898',
-    students: '45,000+',
-    description: 'China\'s oldest modern university, renowned for liberal arts and sciences.'
-  },
-  {
-    name: 'Fudan University',
-    ranking: '3rd in China',
-    globalRanking: 'QS World Ranking: 34th',
-    programs: ['Business', 'Medicine', 'Engineering', 'Arts', 'Journalism', 'Economics'],
-    location: 'Shanghai',
-    founded: '1905',
-    students: '35,000+',
-    description: 'Leading comprehensive university in Shanghai with strong international programs.'
-  },
-  {
-    name: 'Shanghai Jiao Tong University',
-    ranking: '4th in China',
-    globalRanking: 'QS World Ranking: 46th',
-    programs: ['Engineering', 'Business', 'Medicine', 'Technology', 'Maritime Studies', 'Life Sciences'],
-    location: 'Shanghai',
-    founded: '1896',
-    students: '40,000+',
-    description: 'Premier engineering and technology university with strong industry connections.'
-  },
-  {
-    name: 'Zhejiang University',
-    ranking: '5th in China',
-    globalRanking: 'QS World Ranking: 42nd',
-    programs: ['Engineering', 'Medicine', 'Business', 'Agriculture', 'Computer Science', 'Materials Science'],
-    location: 'Hangzhou',
-    founded: '1897',
-    students: '55,000+',
-    description: 'Comprehensive research university with strong engineering and medical programs.'
-  },
-  {
-    name: 'University of Science and Technology of China',
-    ranking: '6th in China',
-    globalRanking: 'QS World Ranking: 87th',
-    programs: ['Physics', 'Chemistry', 'Mathematics', 'Computer Science', 'Engineering', 'Life Sciences'],
-    location: 'Hefei',
-    founded: '1958',
-    students: '18,000+',
-    description: 'Elite science and technology university under Chinese Academy of Sciences.'
-  }
+const universities = [
+  { name: 'Tsinghua University', logo: '🎓', color: 'from-red-500 to-red-700' },
+  { name: 'Peking University', logo: '🏛️', color: 'from-yellow-500 to-yellow-700' },
+  { name: 'Fudan University', logo: '📚', color: 'from-green-500 to-green-700' },
+  { name: 'Shanghai Jiao Tong University', logo: '⚙️', color: 'from-blue-500 to-blue-700' },
+  { name: 'Zhejiang University', logo: '🔬', color: 'from-purple-500 to-purple-700' },
+  { name: 'University of Science and Technology of China', logo: '🧪', color: 'from-indigo-500 to-indigo-700' }
 ];
 
-const scholarships: Scholarship[] = [
-  {
-    name: 'Chinese Government Scholarship (CSC)',
-    amount: 'Full Tuition + Living Allowance',
-    coverage: ['Tuition fees', 'Accommodation', 'Monthly stipend (2,500-3,500 CNY)', 'Medical insurance'],
-    eligibility: ['Non-Chinese citizens', 'Good health', 'Bachelor\'s degree for Master\'s', 'Master\'s degree for PhD'],
-    deadline: 'March 31st'
-  },
-  {
-    name: 'Confucius Institute Scholarship',
-    amount: 'Full Coverage',
-    coverage: ['Tuition fees', 'Accommodation', 'Monthly stipend', 'Medical insurance'],
-    eligibility: ['Chinese language learners', 'Teachers of Chinese', 'Students of Chinese studies'],
-    deadline: 'April 20th'
-  },
-  {
-    name: 'Provincial Government Scholarships',
-    amount: 'Partial to Full Coverage',
-    coverage: ['Tuition fees', 'Living allowance', 'Medical insurance'],
-    eligibility: ['Varies by province', 'Academic excellence', 'Language proficiency'],
-    deadline: 'Varies by province'
-  },
-  {
-    name: 'University-specific Scholarships',
-    amount: '10% - 100% Tuition Waiver',
-    coverage: ['Tuition reduction', 'Living allowance', 'Research funding'],
-    eligibility: ['Academic merit', 'Research potential', 'Leadership qualities'],
-    deadline: 'Varies by university'
-  }
+const scholarships = [
+  { name: 'Chinese Government Scholarship (CSC)', amount: 'Full Tuition + Living Allowance', deadline: 'March 31st' },
+  { name: 'Confucius Institute Scholarship', amount: 'Full Coverage', deadline: 'April 20th' },
+  { name: 'Provincial Government Scholarships', amount: 'Partial to Full Coverage', deadline: 'Varies by province' },
+  { name: 'University-specific Scholarships', amount: '10% - 100% Tuition Waiver', deadline: 'Varies by university' }
 ];
 
 const popularPrograms = [
-  { name: 'Engineering & Technology', duration: '4 years', language: 'English', description: 'Aeronautical, Computer Science, AI, Mechanical' },
-  { name: 'Business & Economics', duration: '4 years', language: 'English', description: 'International Business, Economics, Trade' },
-  { name: 'Medicine & Pharmacy', duration: '6 years', language: 'English', description: 'MBBS, Pharmacy, Clinical Pharmacy' },
-  { name: 'Specialized Fields', duration: '4 years', language: 'English', description: 'Petroleum, Geology, Nuclear Engineering' },
-  { name: 'Foundation Programs', duration: '5 months', language: 'English', description: 'Academic preparation for Bachelor programs' },
-  { name: 'Language Programs', duration: '1-2 years', language: 'Chinese', description: 'Chinese language and culture studies' }
+  { name: 'Engineering & Technology', programs: ['Computer Science', 'AI', 'Mechanical', 'Civil'] },
+  { name: 'Business & Economics', programs: ['MBA', 'Finance', 'Marketing', 'International Business'] },
+  { name: 'Medicine & Health', programs: ['Medicine', 'Dentistry', 'Pharmacy', 'Nursing'] },
+  { name: 'Arts & Humanities', programs: ['Law', 'Literature', 'History', 'Psychology'] }
 ];
 
 const cities = [
@@ -534,20 +435,9 @@ export default function ChinaPage() {
                     {/* First set of logos */}
                     {universities.map((university, index: number) => (
                       <div key={index} className="flex-shrink-0">
-                        <div className="bg-gradient-to-r from-red-500 to-yellow-500 text-white rounded-2xl p-6 w-64 h-40 flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                          <div className="text-4xl mb-3">🎓</div>
+                        <div className={`bg-gradient-to-r ${university.color} text-white rounded-2xl p-8 w-64 h-40 flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2`}>
+                          <div className="text-4xl mb-3">{university.logo}</div>
                           <h3 className="text-lg font-bold text-center leading-tight">{university.name}</h3>
-                          <p className="text-sm text-white opacity-90 mt-2">{university.location}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {/* Duplicate set for seamless loop */}
-                    {universities.map((university, index: number) => (
-                      <div key={`duplicate-${index}`} className="flex-shrink-0">
-                        <div className="bg-gradient-to-r from-red-500 to-yellow-500 text-white rounded-2xl p-6 w-64 h-40 flex flex-col items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                          <div className="text-4xl mb-3">🎓</div>
-                          <h3 className="text-lg font-bold text-center leading-tight">{university.name}</h3>
-                          <p className="text-sm text-white opacity-90 mt-2">{university.location}</p>
                         </div>
                       </div>
                     ))}
@@ -559,27 +449,24 @@ export default function ChinaPage() {
 
             {/* Popular Programs Section */}
             <section>
-              <h2 className="text-3xl font-bold text-gray-900 mb-8">Popular Programs for International Students</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-8">Popular Programs</h2>
               <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {popularPrograms.map((program, index: number) => (
-                    <div key={index} className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                    <div key={index} className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
                       <div className="text-center">
                         <div className="bg-gradient-to-r from-red-500 to-yellow-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                           <span className="text-3xl text-white">🎓</span>
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">{program.name}</h3>
-                        <p className="text-gray-700 mb-4 leading-relaxed">{program.description}</p>
-                        <div className="space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center justify-center">
-                            <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
-                            <span><strong>Duration:</strong> {program.duration}</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <span className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></span>
-                            <span><strong>Language:</strong> {program.language}</span>
-                          </div>
-                        </div>
+                        <ul className="text-gray-700 space-y-2 text-sm">
+                          {program.programs.map((prog, progIndex) => (
+                            <li key={progIndex} className="flex items-center">
+                              <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                              {prog}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   ))}

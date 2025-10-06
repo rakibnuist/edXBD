@@ -63,7 +63,7 @@ export default function UpdateClient({ update }: UpdateClientProps) {
               </div>
               <div className="flex items-center">
                 <Eye className="w-4 h-4 mr-2" />
-                <span>{update.views || 0} views</span>
+                <span>0 views</span>
               </div>
               <button className="flex items-center text-blue-600 hover:text-blue-800 transition-colors hover:bg-blue-50 px-3 py-1 rounded-lg">
                 <Share2 className="w-4 h-4 mr-2" />
@@ -114,7 +114,7 @@ export default function UpdateClient({ update }: UpdateClientProps) {
           </div>
 
           {/* Single Combined CTA Section */}
-          <div className="bg-blue-600 rounded-lg p-8 text-white text-center">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 rounded-lg p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to Start Your Study Abroad Journey?</h2>
             <p className="text-lg mb-6 opacity-90">
               Get FREE consultation and expert guidance for your international education.

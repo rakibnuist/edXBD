@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Heart, MessageCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem, iconBounce } from '@/lib/animations';
+import { countries } from '@/lib/countries';
 
 const Footer = () => {
   const [currentYear, setCurrentYear] = useState(2024);
@@ -12,10 +15,13 @@ const Footer = () => {
     setCurrentYear(new Date().getFullYear());
   }, []);
 
-  const destinations = [
-    'China', 'South Korea', 'UK', 'Netherlands', 'Finland', 
-    'Hungary', 'Cyprus', 'Croatia', 'Georgia'
-  ];
+  // Get featured countries for footer
+  const destinations = countries
+    .filter(country => country.featured)
+    .map(country => ({
+      name: country.name,
+      slug: country.slug
+    }));
 
   const quickLinks = [
     { name: 'Home', href: '/' },
@@ -34,7 +40,13 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden">
+    <motion.footer 
+      className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden"
+      initial="initial"
+      whileInView="animate"
+      viewport={{ once: true, margin: "-100px" }}
+      variants={fadeInUp}
+    >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -44,10 +56,23 @@ const Footer = () => {
 
       <div className="relative container mx-auto px-4 sm:px-6 py-12">
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-8 sm:mb-12">
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-8 sm:mb-12"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+        >
           {/* Brand Section */}
-          <div className="lg:col-span-4">
-            <div className="flex items-center space-x-4 mb-6">
+          <motion.div 
+            className="lg:col-span-4"
+            variants={staggerItem}
+          >
+            <motion.div 
+              className="flex items-center space-x-4 mb-6"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <div className="h-12 w-auto">
                 <Image
                   src="/white-logo.png"
@@ -57,7 +82,7 @@ const Footer = () => {
                   className="h-full w-auto object-contain"
                 />
               </div>
-            </div>
+            </motion.div>
             
             <p className="text-gray-300 text-base leading-relaxed mb-6 max-w-md">
               Your trusted partner for study abroad opportunities with <span className="text-yellow-400 font-semibold">FREE scholarship assistance</span>. 
@@ -66,56 +91,86 @@ const Footer = () => {
 
             {/* Social Links */}
             <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
+              {socialLinks.map((social, index) => (
+                <motion.a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-blue-500 hover:scale-110 transition-all duration-300 border border-white/20"
                   aria-label={social.name}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <social.icon className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
-                </a>
+                  <motion.div
+                    variants={iconBounce}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <social.icon className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                  </motion.div>
+                </motion.a>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Links Section */}
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <motion.div 
+            className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
+            variants={staggerItem}
+          >
             {/* Quick Links */}
-            <div className="min-w-0">
-              <h3 className="text-lg font-bold mb-4 text-gray-100 relative z-10 tracking-wide drop-shadow-sm">
+            <motion.div 
+              className="min-w-0"
+              variants={staggerItem}
+            >
+              <h3 className="text-lg font-bold mb-4 text-white relative z-10 tracking-wide drop-shadow-sm">
                 Quick Links
-                <div className="absolute -bottom-1 left-0 w-8 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full shadow-sm"></div>
+                <motion.div 
+                  className="absolute -bottom-1 left-0 w-8 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full shadow-sm"
+                  initial={{ width: 0 }}
+                  whileInView={{ width: 32 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  viewport={{ once: true }}
+                />
               </h3>
               <div className="space-y-3">
-                {quickLinks.map((link) => (
-                  <Link
+                {quickLinks.map((link, index) => (
+                  <motion.div
                     key={link.name}
-                    href={link.href}
-                    className="block text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    viewport={{ once: true }}
                   >
-                    {link.name}
-                  </Link>
+                    <Link
+                      href={link.href}
+                      className="block text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Destinations */}
             <div className="min-w-0">
-              <h3 className="text-lg font-bold mb-4 text-gray-100 relative z-10 tracking-wide drop-shadow-sm">
+              <h3 className="text-lg font-bold mb-4 text-white relative z-10 tracking-wide drop-shadow-sm">
                 Destinations
                 <div className="absolute -bottom-1 left-0 w-8 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full shadow-sm"></div>
               </h3>
               <div className="space-y-3">
                 {destinations.slice(0, 6).map((country) => (
                   <Link
-                    key={country}
-                    href={`/destinations/${country.toLowerCase().replace(' ', '-')}`}
+                    key={country.slug}
+                    href={`/destinations/${country.slug}`}
                     className="block text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm"
                   >
-                    {country}
+                    {country.name}
                   </Link>
                 ))}
                 {destinations.length > 6 && (
@@ -131,7 +186,7 @@ const Footer = () => {
 
             {/* Contact */}
             <div className="min-w-0 md:col-span-1">
-              <h3 className="text-lg font-bold mb-4 text-gray-100 relative z-10 tracking-wide drop-shadow-sm">
+              <h3 className="text-lg font-bold mb-4 text-white relative z-10 tracking-wide drop-shadow-sm">
                 Contact Us
                 <div className="absolute -bottom-1 left-0 w-8 h-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full shadow-sm"></div>
               </h3>
@@ -193,8 +248,8 @@ const Footer = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Bottom Section */}
         <div className="border-t border-white/10 pt-8">
@@ -215,7 +270,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

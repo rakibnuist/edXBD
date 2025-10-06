@@ -86,6 +86,7 @@ export default async function UpdatePage({ params }: UpdatePageProps) {
       author: update.author,
       publishedAt: update.publishedAt,
       createdAt: update.createdAt,
+      updatedAt: update.updatedAt,
       views: update.views
     };
 

@@ -52,17 +52,12 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
-        heading: ['var(--font-poppins)', 'sans-serif'],
-        body: ['var(--font-inter)', 'sans-serif'],
-        'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
-        'dm-sans': ['var(--font-dm-sans)', 'sans-serif'],
-        'outfit': ['var(--font-outfit)', 'sans-serif'],
-        'caveat': ['var(--font-caveat)', 'cursive'],
-        'dancing-script': ['var(--font-dancing-script)', 'cursive'],
-        'kalam': ['var(--font-kalam)', 'cursive'],
-        'amatic': ['var(--font-amatic-sc)', 'cursive'],
+        heading: ['var(--font-playfair-display)', 'Georgia', 'serif'],
+        body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        primary: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-playfair-display)', 'Georgia', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out',
@@ -75,7 +70,6 @@ module.exports = {
         'slide-in-up': 'slideInUp 0.6s ease-out',
         'slide-in-left': 'slideInLeft 0.6s ease-out',
         'slide-in-right': 'slideInRight 0.6s ease-out',
-        'scale-in': 'scaleIn 0.6s ease-out',
         'bounce': 'bounce 1s ease-in-out',
         'pulse': 'pulse 2s ease-in-out infinite',
       },
@@ -108,15 +102,6 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
         },
-        handDraw: {
-          '0%': { strokeDashoffset: '1000' },
-          '100%': { strokeDashoffset: '0' },
-        },
-        sketchLine: {
-          '0%': { width: '0', opacity: '0' },
-          '50%': { opacity: '1' },
-          '100%': { width: '100%', opacity: '1' },
-        },
         slideInUp: {
           '0%': { opacity: '0', transform: 'translateY(30px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
@@ -128,10 +113,6 @@ module.exports = {
         slideInRight: {
           '0%': { opacity: '0', transform: 'translateX(30px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.9)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
         },
         bounce: {
           '0%, 20%, 53%, 80%, 100%': { transform: 'translate3d(0,0,0)' },
@@ -152,6 +133,8 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 }
 

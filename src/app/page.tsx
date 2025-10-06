@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { 
   GraduationCap, 
   Users, 
@@ -15,15 +14,20 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { trackApplicationStart, trackConsultationRequest } from '@/lib/analytics';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import AnimatedSection from '@/components/AnimatedSection';
+import AnimatedButton from '@/components/AnimatedButton';
+import { fadeInUp, fadeInDown, scaleIn, staggerContainer, staggerItem, float } from '@/lib/animations';
+
+// Import components normally for now - lazy loading can be added later
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 import QuickContactForm from '@/components/QuickContactForm';
 import { Testimonial, Update } from '@/lib/types';
 import { featuredCountries } from '@/lib/countries';
 
-
-export default function Home() {
+const Home = memo(function Home() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentDestination, setCurrentDestination] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -31,20 +35,22 @@ export default function Home() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [updatesLoading, setUpdatesLoading] = useState(true);
   const [currentUpdateSlide, setCurrentUpdateSlide] = useState(0);
+  const [carouselOffset, setCarouselOffset] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  const [currentCarouselSlide, setCurrentCarouselSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
-  const countries = featuredCountries.map(country => ({
-    name: country.name,
-    flag: country.flag,
-    description: country.description
-  }));
-
-  const stats = [
-    { value: '97%', label: 'Success Rate', icon: Award },
-    { value: '3K+', label: 'Students', icon: Users },
-    { value: '48hrs', label: 'Response', icon: Clock },
-    { value: '100%', label: 'Free Service', icon: CheckCircle }
-  ];
-
+  // Create infinite loop countries array - duplicate the array multiple times for seamless loop
+  const countries = useMemo(() => {
+    const baseCountries = featuredCountries.map(country => ({
+      name: country.name,
+      flag: country.flag,
+      description: country.description
+    }));
+    // Create multiple copies for seamless infinite loop
+    return [...baseCountries, ...baseCountries, ...baseCountries];
+  }, []);
 
   // Fetch testimonials from database
   const fetchTestimonials = useCallback(async () => {
@@ -101,7 +107,6 @@ export default function Home() {
       const response = await fetch('/api/testimonials');
       if (response.ok) {
         const data = await response.json();
-        // API already filters for active testimonials and sorts them properly
         setTestimonials(data.length > 0 ? data : fallbackTestimonials);
       } else {
         console.error('Failed to fetch testimonials:', response.statusText);
@@ -135,870 +140,857 @@ export default function Home() {
     }
   }, []);
 
-
   // Fetch testimonials and updates on component mount
   useEffect(() => {
     fetchTestimonials();
     fetchUpdates();
+  }, [fetchTestimonials, fetchUpdates]);
+
+  // Enhanced carousel functionality with pause support
+  useEffect(() => {
+    if (isCarouselPaused) return;
+
+    const interval = setInterval(() => {
+      // Rotate destinations every 6 seconds
+      setCurrentDestination((prev) => (prev + 1) % countries.length);
+      
+      // Enhanced carousel movement with slide-based navigation - one card per slide
+      setCurrentCarouselSlide((prev) => {
+        const totalSlides = featuredCountries.length;
+        return (prev + 1) % totalSlides;
+      });
+      
+      // Rotate updates every 10 seconds
+      if (updates.length > 4) {
+        const totalSlides = Math.ceil(updates.length / 4);
+        setCurrentUpdateSlide((prev) => (prev + 1) % totalSlides);
+      }
+    }, 4000); // 4 seconds for better user experience
+
+    // Separate interval for testimonials to control their speed independently
+    const testimonialInterval = setInterval(() => {
+      if (testimonials.length > 0) {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      }
+    }, 6000); // 6 seconds for testimonials - slower rotation
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(testimonialInterval);
+    };
+  }, [testimonials.length, countries.length, updates.length, isCarouselPaused]);
+
+  // Keyboard navigation support
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        setCurrentCarouselSlide((prev) => {
+          const totalSlides = featuredCountries.length;
+          return prev === 0 ? totalSlides - 1 : prev - 1;
+        });
+      } else if (event.key === 'ArrowRight') {
+        setCurrentCarouselSlide((prev) => {
+          const totalSlides = featuredCountries.length;
+          return (prev + 1) % totalSlides;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Auto-play functionality for testimonials
-  useEffect(() => {
-    if (testimonials.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-      }, 5000); // Change every 5 seconds
+  // Navigation functions
+  const goToPreviousSlide = () => {
+    setCurrentCarouselSlide((prev) => {
+      const totalSlides = featuredCountries.length;
+      return prev === 0 ? totalSlides - 1 : prev - 1;
+    });
+  };
 
-      return () => clearInterval(interval);
+  const goToNextSlide = () => {
+    setCurrentCarouselSlide((prev) => {
+      const totalSlides = featuredCountries.length;
+      return (prev + 1) % totalSlides;
+    });
+  };
+
+  const goToSlide = (slideIndex: number) => {
+    setCurrentCarouselSlide(slideIndex);
+  };
+
+  // Touch/swipe support for mobile
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNextSlide();
+    } else if (isRightSwipe) {
+      goToPreviousSlide();
     }
-  }, [testimonials.length]);
-
-  // Auto-play functionality for destinations
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDestination((prev) => (prev + 1) % countries.length);
-    }, 4000); // Change every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [countries.length]);
-
-  // Auto-play functionality for updates carousel
-  useEffect(() => {
-    if (updates.length > 4) {
-      const totalSlides = Math.ceil(updates.length / 4);
-      const interval = setInterval(() => {
-        setCurrentUpdateSlide((prev) => (prev + 1) % totalSlides);
-      }, 6000); // Change every 6 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [updates.length]);
-
+  };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 overflow-hidden">
-      {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center bg-white">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="text-center max-w-5xl mx-auto">
-            {/* Minimal Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="mb-12"
-            >
-              <div className="inline-flex items-center space-x-2">
-                <div className="minimal-dot"></div>
-                <span className="text-minimal text-lg font-bold text-blue-600">Trusted Since 2018 • 3000+ Students Got Scholarships</span>
-                <div className="minimal-dot"></div>
-              </div>
-            </motion.div>
-
-            {/* Minimal Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="heading-minimal text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-6 sm:mb-8"
-            >
-              Study Abroad
-              <br />
-              <span className="heading-creative">Made Simple</span>
-            </motion.h1>
-
-            {/* Bold Hook */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="mb-4 sm:mb-6"
-            >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-handwriting-bold text-gray-800 mb-3 sm:mb-4 handwriting-tilt handwriting-glow">
-                🎓 <span className="text-blue-600">FREE</span> Scholarship Assistance
-              </h2>
-            </motion.div>
-
-            {/* Minimal Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-minimal text-lg sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto px-4"
-            >
-              Expert study abroad consultancy with <span className="font-bold text-green-600">FREE scholarship assistance</span> since 2018. 6+ years of proven experience helping 3000+ students study at top universities worldwide.
-            </motion.p>
-
-            {/* Creative CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4"
-            >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  trackApplicationStart();
-                  window.dispatchEvent(new CustomEvent('openQuickForm'));
-                }}
-                className="btn-creative w-full sm:w-auto min-h-[48px] text-base sm:text-lg"
-              >
-                <span className="flex items-center justify-center">
-                  Get FREE Consultation
-                  <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6" />
-                </span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-minimal w-full sm:w-auto min-h-[48px] text-base sm:text-lg"
-              >
-                <span className="flex items-center justify-center">
-                  <Phone className="mr-2 sm:mr-3 w-4 h-4 sm:w-5 sm:h-5" />
-                  Call Now
-                </span>
-              </motion.button>
-            </motion.div>
-          </div>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Optimized Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        {/* Simplified Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"
+            variants={float}
+            animate="animate"
+          />
+          <motion.div 
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/10 to-orange-400/10 rounded-full blur-3xl"
+            variants={float}
+            animate="animate"
+            transition={{ delay: 1 }}
+          />
         </div>
 
-        {/* Creative Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            className="absolute top-1/4 left-1/4 w-96 h-96 organic-shape"
-          />
-          <motion.div
-            animate={{
-              x: [0, -100, 0],
-              y: [0, 100, 0],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 organic-shape"
-          />
-          <motion.div
-            animate={{
-              x: [0, 50, 0],
-              y: [0, -50, 0],
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            className="absolute top-1/2 right-1/3 w-64 h-64 organic-shape"
-          />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center max-w-6xl mx-auto">
+            {/* Trust Badge */}
+            <AnimatedSection animation="fadeInDown" delay={0.2}>
+              <div className="mb-8">
+                <motion.div 
+                  className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm border border-blue-200/50 rounded-full px-6 py-3 shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    🏆 Trusted Since 2018 • 3000+ Students Got Scholarships
+                  </span>
+                  <div className="w-3 h-3 bg-blue-500 rounded-full" />
+                </motion.div>
+              </div>
+            </AnimatedSection>
+
+            {/* Main Heading */}
+            <AnimatedSection animation="fadeInUp" delay={0.4}>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mb-6 sm:mb-8 font-bold leading-tight">
+                <motion.span 
+                  className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                >
+                  Study Abroad
+                </motion.span>
+                <motion.span 
+                  className="block bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                >
+                  Made Simple
+                </motion.span>
+              </h1>
+            </AnimatedSection>
+
+            {/* Value Proposition */}
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                🎓 <span className="bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">FREE</span> Scholarship Assistance
+              </h2>
+            </div>
+
+            {/* Subtitle */}
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed">
+              Transform your education journey with expert study abroad consultancy. 
+              <span className="font-bold text-green-600"> FREE scholarship assistance</span> since 2018. 
+              <span className="font-bold text-blue-600"> 97% success rate</span> helping 3000+ students study at top universities worldwide.
+            </p>
+
+            {/* CTA Buttons */}
+            <AnimatedSection animation="fadeInUp" delay={1.2}>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4">
+                <AnimatedButton
+                  onClick={() => {
+                    trackConsultationRequest('hero_cta');
+                    window.dispatchEvent(new CustomEvent('openQuickForm'));
+                  }}
+                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-full font-semibold shadow-2xl hover:shadow-3xl"
+                  icon={<ArrowRight className="w-5 h-5" />}
+                  iconPosition="right"
+                >
+                  Get FREE Consultation
+                </AnimatedButton>
+                
+                <AnimatedButton
+                  onClick={() => trackApplicationStart('phone_call')}
+                  variant="outline"
+                  className="group relative bg-white hover:bg-gray-50 text-blue-600 text-lg px-8 py-4 rounded-full font-semibold shadow-xl border-2 border-blue-600 hover:border-blue-700"
+                  icon={<Phone className="w-5 h-5" />}
+                  iconPosition="left"
+                >
+                  Call Now
+                </AnimatedButton>
+              </div>
+            </AnimatedSection>
+
+            {/* Stats Preview */}
+            <AnimatedSection animation="stagger" delay={1.4}>
+              <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 max-w-4xl mx-auto">
+                {[
+                  { value: "3000+", label: "Students Helped", icon: "🎓" },
+                  { value: "97%", label: "Success Rate", icon: "🏆" },
+                  { value: "2018", label: "Since", icon: "⭐" },
+                  { value: "100%", label: "Free Consultation", icon: "💯" }
+                ].map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.6 + index * 0.1 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                  >
+                    <motion.div 
+                      className="text-3xl mb-2"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 1.8 + index * 0.1, type: "spring", stiffness: 200 }}
+                    >
+                      {stat.icon}
+                    </motion.div>
+                    <div className="text-2xl font-bold text-blue-600 mb-1">{stat.value}</div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatedSection>
+          </div>
         </div>
       </section>
 
-      {/* Creative Process Section */}
-      <section id="process" className="section-minimal bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 relative overflow-hidden">
-        {/* Creative Background Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            animate={{ 
-              rotate: [0, 360],
-              scale: [1, 1.2, 1]
-            }}
-            transition={{ 
-              duration: 25,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-20 right-20 w-24 h-24 bg-gradient-to-r from-purple-200 to-pink-200 rounded-full opacity-20"
-          />
-          <motion.div
-            animate={{ 
-              y: [0, -25, 0],
-              x: [0, 20, 0]
-            }}
-            transition={{ 
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute bottom-20 left-20 w-20 h-20 bg-gradient-to-r from-blue-200 to-green-200 rounded-full opacity-25"
-          />
-        </div>
+      {/* How We Help Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <AnimatedSection animation="fadeInUp" delay={0.2}>
+            <div className="text-center mb-20">
+              <motion.div 
+                className="inline-block mb-8"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              >
+                <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                  <Award className="w-12 h-12 text-white" />
+                </div>
+              </motion.div>
+              
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+                How We Help You
+              </h2>
+              
+              <motion.div 
+                className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-8"
+                initial={{ width: 0 }}
+                animate={{ width: 96 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              />
+              
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                <span className="font-bold text-purple-600">3 Simple Steps</span> to Study Abroad with Scholarship Assistance
+              </p>
+            </div>
+          </AnimatedSection>
 
-        <div className="container-minimal relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center-minimal mb-20"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-block mb-6"
-            >
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto">
-                <Award className="w-10 h-10 text-white" />
-              </div>
-            </motion.div>
-            <h2 className="font-script text-6xl lg:text-7xl mb-6 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent handwriting-tilt">
-              How We Help You
-            </h2>
-            <div className="minimal-divider"></div>
-            <p className="text-minimal text-xl">
-              <span className="font-bold text-purple-600">3 Simple Steps</span> to Study Abroad with Scholarship Assistance
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <AnimatedSection animation="stagger" delay={0.8}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
               {[
                 {
                   step: "01",
-                  title: "Consult",
-                  description: "FREE consultation to understand your goals and find the best study abroad opportunities with scholarship assistance",
-                  icon: MessageCircle,
-                  color: "from-blue-500 to-cyan-500"
+                  title: "Free Consultation",
+                  description: "Get personalized guidance on study abroad opportunities and scholarship options tailored to your profile.",
+                  icon: "💬"
                 },
                 {
                   step: "02", 
-                  title: "Apply",
-                  description: "Complete study abroad applications with FREE scholarship assistance and expert guidance",
-                  icon: Send,
-                  color: "from-purple-500 to-pink-500"
+                  title: "Application Support",
+                  description: "Complete assistance with university applications, document preparation, and scholarship applications.",
+                  icon: "📝"
                 },
                 {
                   step: "03",
-                  title: "Fly",
-                  description: "Get visa approved and fly to your dream study abroad destination",
-                  icon: Plane,
-                  color: "from-green-500 to-emerald-500"
+                  title: "Visa & Departure",
+                  description: "End-to-end visa assistance and pre-departure support to ensure smooth transition to your new country.",
+                  icon: "✈️"
                 }
               ].map((process, index) => (
-              <motion.div
+                <motion.div
                   key={process.step}
-                  initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                  whileHover={{ scale: 1.05, y: -10 }}
                   className="text-center group"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.0 + index * 0.2 }}
+                  whileHover={{ y: -10 }}
                 >
-                  <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden h-full">
-                    {/* Creative Background */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${process.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
-                    <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${process.color} rounded-full -translate-y-12 translate-x-12 opacity-10`} />
-                    
-                    <div className="relative z-10">
-                  <motion.div
-                        className={`w-20 h-20 bg-gradient-to-r ${process.color} rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg`}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                        <process.icon className="w-10 h-10 text-white" />
-                  </motion.div>
-                      
-                      <div className={`w-12 h-12 bg-gradient-to-r ${process.color} rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg`}>
-                        {process.step}
-                      </div>
-                      
-                      <h3 className="heading-minimal text-2xl mb-4">{process.title}</h3>
-                      <p className="text-minimal text-base mb-6">{process.description}</p>
-                      
-                    </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Compact Destinations Section */}
-      <section id="destinations" className="py-16 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-handwriting text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent handwriting-tilt">
-              Study Abroad Destinations
-            </h2>
-            <p className="text-minimal text-lg">
-              <span className="font-bold text-blue-600">Top Countries</span> with Scholarship Opportunities
-            </p>
-          </motion.div>
-
-          {/* Compact Destination Carousel */}
-          <div className="relative max-w-4xl mx-auto">
-            {/* Carousel Container */}
-            <div className="relative h-[400px] overflow-visible rounded-2xl">
-              {countries.map((country, index) => {
-                const isActive = index === currentDestination;
-                const isPrev = index === (currentDestination - 1 + countries.length) % countries.length;
-                const isNext = index === (currentDestination + 1) % countries.length;
-                
-                return (
-                <motion.div
-                    key={country.name}
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0, scale: 0.8, rotateY: 90 }}
-                    animate={{ 
-                      opacity: isActive ? 1 : isPrev || isNext ? 0.6 : 0,
-                      scale: isActive ? 1 : isPrev || isNext ? 0.9 : 0.7,
-                      rotateY: isActive ? 0 : isPrev ? -15 : isNext ? 15 : 0,
-                      zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0
-                    }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    style={{
-                      transformStyle: "preserve-3d",
-                      perspective: "1000px"
-                    }}
-                  >
-                    <div className="relative w-full max-w-3xl mx-auto">
-                      <motion.div
-                        className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 relative overflow-hidden"
-                        whileHover={{ scale: 1.02, rotateY: 2 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {/* Creative Background Pattern */}
-                        <div className="absolute inset-0 opacity-5">
-                          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full -translate-y-32 translate-x-32" />
-                          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-pink-400 to-orange-400 rounded-full translate-y-24 -translate-x-24" />
-                          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-r from-green-400 to-blue-400 rounded-full -translate-x-16 -translate-y-16" />
-                        </div>
-
-                        <div className="relative z-10 text-center">
-                          {/* Flag with Creative Animation */}
-                          <motion.div 
-                            className="text-6xl mb-4"
-                            whileHover={{ 
-                              scale: 1.2, 
-                              rotate: [0, -10, 10, 0],
-                              transition: { duration: 0.6 }
-                            }}
-                          >
-                            {country.flag}
-                </motion.div>
-
-                          {/* Country Name */}
-                          <h3 className="heading-minimal text-2xl mb-3">
-                            {country.name}
-                          </h3>
-
-                          {/* Description */}
-                          <p className="text-minimal text-base mb-6 max-w-xl mx-auto">
-                            {country.description}
-                          </p>
-
-                          {/* Scholarship Badge */}
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            className="mb-8"
-                          >
-              </motion.div>
-
-                          {/* CTA Button */}
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-full font-semibold text-base hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                            onClick={() => {
-                              trackConsultationRequest('destination_exploration');
-                              window.dispatchEvent(new CustomEvent('openQuickForm'));
-                            }}
-                          >
-                            <span className="flex items-center justify-center">
-                              <Plane className="mr-2 w-4 h-4" />
-                              Study in {country.name}
-                              <ArrowRight className="ml-2 w-4 h-4" />
-                            </span>
-                          </motion.button>
-                        </div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* Creative Stats Section */}
-      <section className="section-minimal bg-gradient-to-br from-white via-blue-50 to-purple-50 relative overflow-hidden">
-        {/* Creative Background Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            animate={{ 
-              rotate: [0, 360],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-10 left-1/4 w-20 h-20 bg-gradient-to-r from-blue-200 to-purple-200 rounded-full opacity-20"
-          />
-          <motion.div
-            animate={{ 
-              y: [0, -20, 0],
-              x: [0, 15, 0]
-            }}
-            transition={{ 
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute bottom-10 right-1/4 w-16 h-16 bg-gradient-to-r from-green-200 to-blue-200 rounded-full opacity-25"
-          />
-        </div>
-
-        <div className="container-minimal relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-amatic text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent handwriting-tilt">
-              💯 Our Success Rate
-            </h2>
-            <div className="minimal-divider"></div>
-            <p className="text-minimal text-lg">
-              <span className="font-bold text-blue-600">97% Success Rate</span> in Study Abroad Applications with Scholarship Assistance since 2018
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-                <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                className="text-center group"
-              >
-                <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
-                  {/* Creative Background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full -translate-y-8 translate-x-8 opacity-20" />
-                  
-                  <div className="relative z-10">
-                    <motion.div
-                      className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+                  <div className="relative mb-8">
+                    <motion.div 
+                      className="w-32 h-32 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105"
                       whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <stat.icon className="w-8 h-8 text-white" />
+                      <motion.span 
+                        className="text-4xl"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 1.2 + index * 0.2, type: "spring", stiffness: 200 }}
+                      >
+                        {process.icon}
+                      </motion.span>
                     </motion.div>
-                    <div className="text-3xl font-heading font-bold mb-2 text-gray-900">
-                      {stat.value}
-                    </div>
-                    <div className="text-minimal text-sm">{stat.label}</div>
-                    
+                    <motion.div 
+                      className="absolute -top-2 -right-2 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 1.4 + index * 0.2, type: "spring", stiffness: 200 }}
+                    >
+                      {process.step}
+                    </motion.div>
                   </div>
-                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    {process.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 leading-relaxed">
+                    {process.description}
+                  </p>
                 </motion.div>
               ))}
-          </div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
-
-      {/* Creative Student Stories Section */}
-      <section id="testimonials" className="section-minimal bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
-        <div className="container-minimal">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center-minimal mb-16"
-          >
-            <h2 className="font-casual text-4xl lg:text-5xl mb-4 handwriting-tilt">
-              🌟 Success Stories
-            </h2>
-            <div className="minimal-divider"></div>
-            <p className="text-minimal text-base">
-              <span className="font-bold text-purple-600">Real Students</span> who achieved their study abroad dreams with our scholarship assistance
-            </p>
-          </motion.div>
-
-          {/* Creative Carousel Container */}
-          <div className="relative">
-            {/* Floating Background Elements */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-10 left-10 w-20 h-20 bg-blue-100 rounded-full opacity-30 floating-bg-1" />
-              <div className="absolute top-20 right-20 w-16 h-16 bg-purple-100 rounded-full opacity-40 floating-bg-2" />
-              <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-green-100 rounded-full opacity-35 floating-bg-3" />
-            </div>
-
-            {/* Main Carousel */}
-            <div className="relative max-w-6xl mx-auto">
-              {/* Testimonial Cards Container */}
-              <div className="relative h-[500px] overflow-visible">
-                {testimonialsLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-gray-600">Loading testimonials...</p>
-                    </div>
-                  </div>
-                ) : testimonials.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <p className="text-gray-600">No testimonials available at the moment.</p>
-                    </div>
-                  </div>
-                ) : (
-                  testimonials.map((testimonial, index) => {
-                  const isActive = index === currentTestimonial;
-                  const isPrev = index === (currentTestimonial - 1 + testimonials.length) % testimonials.length;
-                  const isNext = index === (currentTestimonial + 1) % testimonials.length;
-                  
-                  return (
-              <motion.div
-                key={testimonial.name}
-                      className="absolute inset-0 flex items-center justify-center"
-                      initial={{ opacity: 0, scale: 0.8, rotateY: 90 }}
-                      animate={{ 
-                        opacity: isActive ? 1 : isPrev || isNext ? 0.7 : 0,
-                        scale: isActive ? 1 : isPrev || isNext ? 0.95 : 0.85,
-                        rotateY: isActive ? 0 : isPrev ? -10 : isNext ? 10 : 0,
-                        zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0
-                      }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
-                      style={{
-                        transformStyle: "preserve-3d",
-                        perspective: "1000px"
-                      }}
-                    >
-                      <div className={`
-                        relative w-full max-w-2xl mx-auto
-                        ${isActive ? 'transform-none' : 'transform-gpu'}
-                      `}>
-                        {/* Main Card */}
-                      <motion.div
-                          className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100 relative overflow-hidden carousel-card"
-                          whileHover={{ scale: 1.02, rotateY: 2 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          {/* Creative Decorative Elements */}
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-16 translate-x-16 opacity-60" />
-                          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-100 to-blue-100 rounded-full translate-y-12 -translate-x-12 opacity-50" />
-                          <div className="absolute top-1/2 left-1/2 w-16 h-16 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full -translate-x-8 -translate-y-8 opacity-40" />
-                          
-                          {/* Content */}
-                          <div className="relative z-10">
-                            {/* Stars */}
-                            <motion.div 
-                              className="flex justify-center mb-6"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.3, duration: 0.5 }}
-                            >
-                              {[...Array(testimonial.rating)].map((_, i) => (
-                                <motion.span 
-                        key={i}
-                                  className="text-yellow-400 text-2xl mx-1 carousel-star"
-                                  initial={{ opacity: 0, y: -20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.4 + i * 0.1, duration: 0.3 }}
-                                >
-                                  ⭐
-                                </motion.span>
-                              ))}
-                            </motion.div>
-
-                            {/* Quote */}
-                            <motion.blockquote 
-                              className="text-minimal text-xl mb-8 italic text-center leading-relaxed"
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.5, duration: 0.6 }}
-                            >
-                              &ldquo;{testimonial.quote}&rdquo;
-                            </motion.blockquote>
-
-                            {/* Student Info */}
-                            <motion.div 
-                              className="flex items-center justify-center mb-6"
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.6, duration: 0.6 }}
-                            >
-                              <div className="text-5xl mr-6 transform hover:scale-110 transition-transform duration-300">
-                                {testimonial.image}
-                              </div>
-                              <div className="text-left">
-                                <h4 className="heading-minimal text-2xl mb-1">
-                          {testimonial.name}
-                        </h4>
-                                <p className="text-minimal text-sm text-gray-600">
-                          {testimonial.location}
-                        </p>
-                      </div>
-                            </motion.div>
-                            
-                            {/* Program Info */}
-                            <motion.div 
-                              className="text-center"
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.7, duration: 0.6 }}
-                            >
-                              <p className="text-minimal text-base font-medium text-blue-600 mb-1">
-                        {testimonial.program}
-                      </p>
-                              <p className="text-minimal text-sm text-gray-500 mb-3">
-                        {testimonial.university}
-                      </p>
-                              
-                            </motion.div>
-                  </div>
-                        </motion.div>
-                </div>
-              </motion.div>
-                  );
-                })
-                )}
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Updates Section */}
-      <section id="updates" className="py-24 bg-white">
+      {/* Enhanced Featured Countries Carousel Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
         <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl lg:text-5xl font-heading font-bold mb-4 text-gray-900">
-              LATEST UPDATES
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+              Popular Study Destinations
             </h2>
-            <p className="text-xl font-body text-gray-600 max-w-2xl mx-auto mb-8">
-              Latest opportunities and news
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Explore our most popular study destinations with comprehensive support and scholarship opportunities
             </p>
-            
-            {/* View All Updates Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => window.location.href = '/updates'}
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-full font-semibold text-base hover:bg-blue-700 transition-all duration-300 shadow-lg"
-            >
-              <span className="flex items-center">
-                View All Updates
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </span>
-            </motion.button>
-          </motion.div>
+          </div>
 
-          {updatesLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading updates...</p>
+          {/* Enhanced Carousel with Controls */}
+          <div className="max-w-7xl mx-auto">
+            <div 
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/60 via-blue-50/30 to-purple-50/40 backdrop-blur-md shadow-2xl border border-white/30 hover:border-blue-200/50 transition-all duration-500"
+              onMouseEnter={() => setIsCarouselPaused(true)}
+              onMouseLeave={() => setIsCarouselPaused(false)}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
+              {/* Subtle animated background pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 animate-pulse"></div>
               </div>
-            </div>
-          ) : updates.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">📰</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No updates available</h3>
-              <p className="text-gray-600">Check back later for the latest news and opportunities.</p>
-            </div>
-          ) : (
-            <div className="relative max-w-7xl mx-auto">
-              {/* Carousel Container */}
-              <div className="relative overflow-hidden rounded-2xl">
-                <motion.div
-                  className="flex transition-transform duration-500 ease-in-out"
-                  animate={{
-                    x: `-${currentUpdateSlide * 100}%`
+              {/* Enhanced Navigation Buttons with Glow Effects */}
+              <button
+                onClick={goToPreviousSlide}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group"
+                aria-label="Previous destinations"
+              >
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300 blur-sm"></div>
+                <ChevronLeft className="relative w-6 h-6 group-hover:-translate-x-1 transition-transform duration-200" />
+              </button>
+              
+              <button
+                onClick={goToNextSlide}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group"
+                aria-label="Next destinations"
+              >
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300 blur-sm"></div>
+                <ChevronRight className="relative w-6 h-6 group-hover:translate-x-1 transition-transform duration-200" />
+              </button>
+
+              {/* Carousel Container - One Card Per Slide */}
+              <div className="overflow-hidden">
+                <div 
+                  className="flex transition-transform duration-700 ease-in-out"
+                  style={{ 
+                    transform: `translateX(-${currentCarouselSlide * 100}%)`
                   }}
                 >
-                  {Array.from({ length: Math.ceil(updates.length / 4) }).map((_, slideIndex) => (
-                    <div key={slideIndex} className="w-full flex-shrink-0">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-                        {updates.slice(slideIndex * 4, (slideIndex + 1) * 4).map((update, index) => (
-                          <motion.div
-                            key={update._id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            className="group cursor-pointer"
-                            onClick={() => window.location.href = `/updates/${update.slug}`}
-                          >
-                            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
-                              <div className="flex flex-col h-full">
-                                {/* Icon */}
-                                <motion.div
-                                  initial={{ opacity: 0, scale: 0 }}
-                                  whileInView={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: index * 0.1 + 0.2 }}
-                                  className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"
-                                >
-                                  <span className="text-2xl">
-                                    {update.category === 'Scholarships' ? '🎓' :
-                                     update.category === 'Events' ? '📚' :
-                                     update.category === 'Success Stories' ? '✈️' :
-                                     update.category === 'Partnerships' ? '🤝' :
-                                     update.category === 'News' ? '📰' : '📢'}
-                                  </span>
-                                </motion.div>
-
-                                {/* Content */}
-                                <div className="flex-1 flex flex-col">
-                                  <div className="flex items-center justify-between mb-3">
-                                    <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                      {update.category || 'Update'}
-                                    </span>
-                                    <span className="font-body text-gray-500 text-xs">
-                                      {new Intl.DateTimeFormat('en-US', {
-                                        month: 'short',
-                                        day: 'numeric'
-                                      }).format(new Date(update.publishedAt || update.createdAt))}
-                                    </span>
-                                  </div>
-
-                                  <h3 className="font-heading font-semibold text-gray-900 text-base mb-3 line-clamp-2">
-                                    {update.title}
-                                  </h3>
-
-                                  <p className="font-body text-gray-600 text-sm leading-relaxed flex-1 line-clamp-3">
-                                    {update.excerpt || update.metaDescription || `Learn more about ${update.title.split('—')[0]?.trim() || 'this program'}`}
-                                  </p>
-                                  
-                                  {/* Read More Indicator */}
-                                  <div className="mt-3 flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors duration-200">
-                                    <span>Read more</span>
-                                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                  </div>
-                                </div>
+                  {featuredCountries.map((country, index) => (
+                    <div key={country.name} className="w-full flex-shrink-0 px-10 py-10">
+                      <div className="flex justify-center">
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 }}
+                          className="group bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-105 cursor-pointer border border-white/30 hover:border-indigo-300/60 relative overflow-hidden max-w-lg w-full"
+                          onClick={() => {
+                            trackApplicationStart(`country_${country.name.toLowerCase()}`);
+                            window.dispatchEvent(new CustomEvent('openQuickForm'));
+                          }}
+                          whileHover={{ y: -8 }}
+                        >
+                          {/* Enhanced multi-layer gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/0 via-purple-50/0 to-pink-50/0 group-hover:from-indigo-50/60 group-hover:via-purple-50/50 group-hover:to-pink-50/60 transition-all duration-700 rounded-3xl"></div>
+                          
+                          {/* Animated pattern overlay */}
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
+                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/30 via-purple-400/20 to-pink-400/30 rounded-3xl animate-pulse"></div>
+                          </div>
+                          
+                          {/* Subtle border glow effect */}
+                          <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-indigo-400/20 via-purple-400/20 to-pink-400/20 blur-sm"></div>
+                          </div>
+                          
+                          <div className="text-center relative z-10">
+                            {/* Enhanced flag with glow effect */}
+                            <div className="relative mb-10">
+                              <motion.div 
+                                className="text-9xl mb-3 group-hover:scale-110 transition-transform duration-500 filter group-hover:drop-shadow-2xl group-hover:brightness-110"
+                                whileHover={{ scale: 1.15, rotate: 5 }}
+                              >
+                                {country.flag}
+                              </motion.div>
+                              {/* Subtle glow effect behind flag */}
+                              <div className="absolute inset-0 text-9xl opacity-0 group-hover:opacity-25 transition-opacity duration-500 blur-sm">
+                                {country.flag}
                               </div>
                             </div>
-                          </motion.div>
-                        ))}
+                            
+                            {/* Enhanced title with gradient text */}
+                            <h3 className="text-3xl font-bold mb-6 leading-tight bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:via-purple-600 group-hover:to-pink-600 transition-all duration-500">
+                              {country.name}
+                            </h3>
+                            
+                            {/* Enhanced description with better typography */}
+                            <p className="text-lg text-gray-600 mb-10 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed font-medium">
+                              {country.description}
+                            </p>
+                            
+                            {/* Enhanced CTA button with gradient background */}
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur opacity-0 group-hover:opacity-80 transition-opacity duration-500"></div>
+                              <motion.div 
+                                className="relative inline-flex items-center text-white font-bold text-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 group-hover:from-indigo-500 group-hover:via-purple-500 group-hover:to-pink-500 px-10 py-5 rounded-full transition-all duration-300 shadow-xl group-hover:shadow-2xl"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                Explore {country.name}
+                                <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                              </motion.div>
+                            </div>
+                          </div>
+                        </motion.div>
                       </div>
                     </div>
                   ))}
-                </motion.div>
+                </div>
               </div>
 
-              {/* Navigation Controls */}
-              {updates.length > 4 && (
-                <div className="flex items-center justify-center mt-8 space-x-4">
-                  {/* Previous Button */}
+              {/* Enhanced Progress Indicators with Modern Design */}
+              <div className="flex justify-center space-x-6 pb-10">
+                {featuredCountries.map((country, index) => (
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
+                    key={country.name}
+                    onClick={() => goToSlide(index)}
+                    className={`relative w-5 h-5 rounded-full transition-all duration-500 ${
+                      index === currentCarouselSlide 
+                        ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 scale-125 shadow-2xl' 
+                        : 'bg-gray-300/60 hover:bg-indigo-400/80 hover:scale-110 backdrop-blur-sm'
+                    }`}
+                    aria-label={`Go to ${country.name}`}
+                    title={country.name}
+                    whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                      const totalSlides = Math.ceil(updates.length / 4);
-                      setCurrentUpdateSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-                    }}
-                    className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border border-gray-200"
                   >
-                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    {index === currentCarouselSlide && (
+                      <>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 animate-ping opacity-60"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 blur-sm"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-pink-500/30 blur-md"></div>
+                      </>
+                    )}
+                    {index !== currentCarouselSlide && (
+                      <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                    )}
                   </motion.button>
+                ))}
+              </div>
+            </div>
 
-                  {/* Slide Indicators */}
-                  <div className="flex space-x-2">
-                    {Array.from({ length: Math.ceil(updates.length / 4) }).map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentUpdateSlide(index)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
-                          index === currentUpdateSlide ? 'bg-blue-600' : 'bg-gray-300'
-                        }`}
-                      />
+            {/* Enhanced Carousel Info */}
+            <div className="text-center mt-8">
+              <motion.p 
+                className="text-sm text-gray-600 font-medium mb-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                Use arrow keys, swipe, or click the navigation buttons to explore each destination
+              </motion.p>
+              <div className="flex items-center justify-center space-x-6 text-xs text-gray-500 font-medium">
+                <motion.span 
+                  className="flex items-center bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <ChevronLeft className="w-3 h-3 mr-1" />
+                  Previous
+                </motion.span>
+                <motion.span 
+                  className="flex items-center bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Next
+                  <ChevronRight className="w-3 h-3 ml-1" />
+                </motion.span>
+                <span className="text-gray-400">•</span>
+                <span className="bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50">
+                  Click dots to jump to specific country
+                </span>
+              </div>
+              <motion.p 
+                className="text-sm text-gray-500 mt-4 font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                Showing {currentCarouselSlide + 1} of {featuredCountries.length} destinations
+              </motion.p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Enhanced Testimonials Section */}
+      <section className="py-24 bg-gradient-to-br from-white via-slate-50/50 to-blue-50/30 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-emerald-400/5 to-teal-400/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-blue-400/5 to-indigo-400/5 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <AnimatedSection animation="fadeInUp" delay={0.2}>
+            <div className="text-center mb-20">
+              <motion.div 
+                className="inline-block mb-8"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              >
+                <div className="w-28 h-28 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl relative overflow-hidden">
+                  <Users className="w-14 h-14 text-white relative z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full" />
+                </div>
+              </motion.div>
+              
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 bg-clip-text text-transparent">
+                Success Stories
+              </h2>
+              
+              <motion.div 
+                className="w-32 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 rounded-full mx-auto mb-8 shadow-lg"
+                initial={{ width: 0 }}
+                animate={{ width: 128 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              />
+              
+              <p className="text-xl text-gray-600 max-w-4xl mx-auto font-medium">
+                Hear from students who achieved their study abroad dreams with our support
+              </p>
+            </div>
+          </AnimatedSection>
+
+          {testimonialsLoading ? (
+            <div className="text-center">
+              <motion.div 
+                className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200 border-t-emerald-600 mx-auto mb-6"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+              <p className="text-gray-600 text-lg font-medium">Loading testimonials...</p>
+            </div>
+          ) : (
+            <div className="max-w-5xl mx-auto">
+              <motion.div 
+                className="bg-white/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/30 relative overflow-hidden"
+                key={currentTestimonial}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-blue-50/50 rounded-3xl" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-teal-400/10 rounded-full blur-2xl" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-2xl" />
+                
+                <div className="text-center relative z-10">
+                  <motion.div 
+                    className="text-8xl mb-8"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  >
+                    {testimonials[currentTestimonial]?.image || "👨‍🎓"}
+                  </motion.div>
+                  
+                  <div className="flex justify-center mb-6">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 200 }}
+                      >
+                        <CheckCircle
+                          className={`w-7 h-7 ${i < (testimonials[currentTestimonial]?.rating || 5) ? 'text-yellow-400' : 'text-gray-300'}`}
+                        />
+                      </motion.div>
                     ))}
                   </div>
-
-                  {/* Next Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                      const totalSlides = Math.ceil(updates.length / 4);
-                      setCurrentUpdateSlide((prev) => (prev + 1) % totalSlides);
-                    }}
-                    className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border border-gray-200"
+                  
+                  <motion.blockquote 
+                    className="text-xl text-gray-700 mb-8 italic leading-relaxed font-medium"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
                   >
-                    <ChevronRight className="w-5 h-5 text-gray-600" />
-                  </motion.button>
+                    "{testimonials[currentTestimonial]?.quote || 'EduExpress International made my study abroad dream come true!'}"
+                  </motion.blockquote>
+                  
+                  <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <h4 className="font-bold text-gray-900 text-xl mb-2">
+                      {testimonials[currentTestimonial]?.name || "Student"}
+                    </h4>
+                    <p className="text-gray-600 text-lg">
+                      {testimonials[currentTestimonial]?.university || "University"} • {testimonials[currentTestimonial]?.program || "Program"}
+                    </p>
+                  </motion.div>
                 </div>
-              )}
+              </motion.div>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
-        <div className="container-minimal text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center-minimal"
-          >
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-white">
-              🚀 Ready to Study Abroad?
-            </h2>
-            <p className="text-blue-100 text-lg mb-8">
-              Join <span className="font-bold text-yellow-300">3000+ students</span> who achieved their study abroad dreams with our FREE scholarship assistance since 2018
-            </p>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                trackConsultationRequest('final_cta');
-                window.dispatchEvent(new CustomEvent('openQuickForm'));
-              }}
-              className="bg-white text-blue-600 hover:bg-gray-50 text-lg px-8 py-3 rounded-full font-semibold transition-all duration-300"
-            >
-              <span className="flex items-center">
-                <GraduationCap className="mr-2 w-5 h-5" />
-                Get FREE Consultation
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </span>
-            </motion.button>
-          </motion.div>
+      {/* Latest Updates Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <AnimatedSection animation="fadeInUp" delay={0.2}>
+              <motion.div 
+                className="inline-block mb-8"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              >
+                <div className="w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                  <MessageCircle className="w-12 h-12 text-white" />
+                </div>
+              </motion.div>
+              
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+                Latest Updates
+              </h2>
+              
+              <motion.div 
+                className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mx-auto mb-8"
+                initial={{ width: 0 }}
+                animate={{ width: 96 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+              />
+              
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Stay informed with the latest news, scholarship opportunities, and study abroad insights
+              </p>
+            </AnimatedSection>
+          </div>
+
+          {updatesLoading ? (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading latest updates...</p>
+            </div>
+          ) : updates.length > 0 ? (
+            <AnimatedSection animation="stagger" delay={0.8}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                {updates.slice(0, 4).map((update, index) => (
+                  <motion.article
+                    key={update._id}
+                    className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border border-gray-100 hover:border-green-200 relative overflow-hidden"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.0 + index * 0.1 }}
+                    onClick={() => window.open(`/updates/${update.slug}`, '_blank')}
+                  >
+                    {/* Featured Badge */}
+                    {update.isFeatured && (
+                      <div className="absolute top-3 right-3 z-10">
+                        <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-pulse"></div>
+                      </div>
+                    )}
+                    
+                    {/* Card Content */}
+                    <div className="p-6 h-full flex flex-col">
+                      {/* Category Badge */}
+                      {update.category && (
+                        <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 mb-4 w-fit">
+                          {update.category}
+                        </div>
+                      )}
+                      
+                      {/* Title */}
+                      <header className="mb-4 flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300 line-clamp-2 leading-tight">
+                          {update.title}
+                        </h3>
+                      </header>
+                      
+                      {/* Meta Description */}
+                      <div className="mb-6 flex-1">
+                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                          {update.metaDescription || update.excerpt || 'Stay updated with the latest news and opportunities.'}
+                        </p>
+                      </div>
+                      
+                      {/* Read More Link */}
+                      <footer className="mt-auto">
+                        <div className="inline-flex items-center text-green-600 hover:text-green-700 font-medium text-sm group-hover:translate-x-1 transition-all duration-300">
+                          <span>Read More</span>
+                          <ArrowRight className="ml-1 w-4 h-4" />
+                        </div>
+                      </footer>
+                    </div>
+                    
+                    {/* Hover Effect Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-50/0 to-emerald-50/0 group-hover:from-green-50/30 group-hover:to-emerald-50/20 transition-all duration-300 rounded-xl"></div>
+                  </motion.article>
+                ))}
+              </div>
+              
+              {/* View All Updates Button */}
+              <div className="text-center mt-12">
+                <AnimatedButton
+                  onClick={() => window.open('/updates', '_blank')}
+                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-full font-semibold shadow-2xl hover:shadow-3xl"
+                  icon={<ArrowRight className="w-5 h-5" />}
+                  iconPosition="right"
+                >
+                  View All Updates
+                </AnimatedButton>
+              </div>
+            </AnimatedSection>
+          ) : (
+            <div className="text-center">
+              <div className="text-6xl mb-6">📰</div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Updates Available</h3>
+              <p className="text-gray-500">Check back soon for the latest news and updates!</p>
+            </div>
+          )}
         </div>
       </section>
 
+      {/* Enhanced Final CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-white/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-white/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-white/5 to-transparent rounded-full blur-2xl" />
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center max-w-5xl mx-auto">
+            <motion.div 
+              className="inline-block mb-10"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            >
+              <div className="w-32 h-32 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center mx-auto shadow-2xl border border-white/30 relative overflow-hidden">
+                <span className="text-5xl relative z-10">🚀</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full" />
+              </div>
+            </motion.div>
+            
+            <motion.h2 
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-8 text-white"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+            >
+              Ready to Study Abroad?
+            </motion.h2>
+            
+            <motion.div 
+              className="w-32 h-1.5 bg-white/60 rounded-full mx-auto mb-10 shadow-lg"
+              initial={{ width: 0 }}
+              animate={{ width: 128 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            />
+            
+            <motion.p 
+              className="text-blue-100 text-xl lg:text-2xl mb-16 max-w-4xl mx-auto leading-relaxed font-medium"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
+              Join <span className="font-bold text-yellow-300 bg-yellow-300/20 px-3 py-1 rounded-full">3000+ students</span> who achieved their study abroad dreams with our FREE scholarship assistance since 2018
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0, duration: 0.8 }}
+            >
+              <AnimatedButton
+                onClick={() => {
+                  trackConsultationRequest('final_cta');
+                  window.dispatchEvent(new CustomEvent('openQuickForm'));
+                }}
+                className="group relative bg-white text-indigo-600 hover:bg-gray-50 text-xl px-16 py-6 rounded-full font-bold shadow-2xl hover:shadow-3xl border border-white/20 backdrop-blur-sm"
+                icon={<GraduationCap className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" />}
+                iconPosition="left"
+              >
+                <span className="relative z-10">Get FREE Consultation</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/0 via-indigo-50/50 to-indigo-50/0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </AnimatedButton>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-
-      {/* WhatsApp Widget */}
+      {/* Optimized components */}
       <WhatsAppWidget />
-
-      {/* Quick Contact Form Modal */}
       <QuickContactForm />
     </div>
   );
-}
+});
+
+export default Home;

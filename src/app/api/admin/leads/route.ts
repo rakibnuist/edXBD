@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const source = searchParams.get('source');
+    const country = searchParams.get('country');
 
     let query = {};
     if (status && status !== 'all') {
@@ -16,6 +17,9 @@ export async function GET(request: NextRequest) {
     }
     if (source && source !== 'all') {
       query = { ...query, source };
+    }
+    if (country && country !== 'all') {
+      query = { ...query, country };
     }
 
     const leads = await Lead.find(query)

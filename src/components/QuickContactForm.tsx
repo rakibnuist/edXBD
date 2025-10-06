@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Mail, MessageCircle, X, Award } from 'lucide-react';
+import { modalBackdrop, modalContent, fadeInUp, scaleInCenter } from '@/lib/animations';
 import { 
   trackConsultationRequest, 
   trackFormStart,
@@ -194,23 +195,25 @@ const QuickContactForm = () => {
     setFieldFocusTimes({});
   };
 
-  if (!isOpen) return null;
-
   return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
-        onClick={handleClose}
-      >
+    <AnimatePresence>
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 50 }}
-          className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mx-2"
-          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+          onClick={handleClose}
+          variants={modalBackdrop}
+          initial="initial"
+          animate="animate"
+          exit="exit"
         >
+          <motion.div
+            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mx-2"
+            onClick={(e) => e.stopPropagation()}
+            variants={modalContent}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -220,57 +223,63 @@ const QuickContactForm = () => {
         </button>
 
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <motion.div 
+          className="text-center mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <motion.div 
+            className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+          >
             <Award className="w-8 h-8 text-white" />
-          </div>
+          </motion.div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Get Free Study Abroad Consultation</h2>
           <p className="text-gray-600">Tell us about your study abroad goals</p>
-        </div>
+        </motion.div>
 
         {isSubmitted ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 20,
-              delay: 0.1 
-            }}
+          <motion.div 
             className="text-center py-8"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
           >
             <motion.div 
+              className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 500, 
-                damping: 15,
-                delay: 0.2 
-              }}
-              className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             >
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 500, 
-                  damping: 15,
-                  delay: 0.4 
-                }}
-              >
-                <CheckCircle className="w-10 h-10 text-white" />
-              </motion.div>
+              <CheckCircle className="w-10 h-10 text-white" />
             </motion.div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">🎉 Congratulations!</h3>
-            <p className="text-lg font-semibold text-green-600 mb-2">
+            <motion.h3 
+              className="text-2xl font-bold text-gray-900 mb-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              🎉 Congratulations!
+            </motion.h3>
+            <motion.p 
+              className="text-lg font-semibold text-green-600 mb-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
               Your application has been submitted successfully!
-            </p>
-            <p className="text-gray-600 mb-6">
+            </motion.p>
+            <motion.p 
+              className="text-gray-600 mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
               We&apos;ve received your information and our expert counselors will contact you within 24 hours to discuss your study abroad journey.
-            </p>
+            </motion.p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <p className="text-sm font-medium text-blue-900 mb-2">What happens next?</p>
               <ul className="text-sm text-blue-800 space-y-1">
@@ -294,10 +303,11 @@ const QuickContactForm = () => {
           </motion.div>
         ) : (
           <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
             onSubmit={handleSubmit}
             className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
           >
             <div>
               <input
@@ -397,12 +407,16 @@ const QuickContactForm = () => {
             <motion.button
               type="submit"
               disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl min-h-[48px] text-base hover:scale-105 transform"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl min-h-[48px] text-base"
             >
               {isSubmitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                <motion.div 
+                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                />
               ) : (
                 <Award className="w-5 h-5 mr-2" />
               )}
@@ -431,8 +445,10 @@ const QuickContactForm = () => {
             </a>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

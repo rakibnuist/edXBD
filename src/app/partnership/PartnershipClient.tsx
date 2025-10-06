@@ -9,7 +9,6 @@ import {
   Globe, 
   Shield, 
   BookOpen, 
-  Target,
   CheckCircle,
   ArrowRight,
   Star,
@@ -17,45 +16,40 @@ import {
   Headphones,
   Zap
 } from 'lucide-react';
+import PartnershipForm from '@/components/PartnershipForm';
 
 const PartnershipClient = () => {
 
   const partnershipTypes = [
     {
       title: 'Authorized Agent',
-      description: 'Become our authorized agent and represent EduExpress International in your region',
+      description: 'Represent EduExpress in your region',
       features: [
         'Exclusive territory rights',
-        'Comprehensive training program',
-        'Marketing materials and support',
-        'Competitive commission structure',
-        'Regular performance bonuses'
+        'Training and support',
+        'Marketing materials'
       ],
       icon: Shield,
       color: 'from-blue-500 to-blue-700'
     },
     {
       title: 'Strategic Partner',
-      description: 'Long-term strategic partnership for established education consultancies',
+      description: 'Long-term partnership for established consultancies',
       features: [
         'Joint marketing initiatives',
-        'Shared resources and expertise',
-        'Customized partnership terms',
-        'Priority support and training',
-        'Revenue sharing opportunities'
+        'Shared resources',
+        'Customized terms'
       ],
       icon: Handshake,
       color: 'from-purple-500 to-purple-700'
     },
     {
       title: 'Referral Partner',
-      description: 'Simple referral program for individuals and small businesses',
+      description: 'Simple referral program',
       features: [
         'Easy referral process',
-        'Attractive referral fees',
         'No upfront investment',
-        'Flexible working arrangements',
-        'Quick payout system'
+        'Flexible arrangements'
       ],
       icon: Users,
       color: 'from-green-500 to-green-700'
@@ -66,69 +60,64 @@ const PartnershipClient = () => {
     {
       icon: TrendingUp,
       title: 'Revenue Growth',
-      description: 'Increase your revenue with our proven study abroad programs and competitive commission structure'
+      description: 'Up to 15% commission on successful placements',
+      stat: 'Up to 15% commission'
     },
     {
       icon: Globe,
       title: 'Global Network',
-      description: 'Access our extensive network of universities and institutions worldwide'
+      description: 'Access to 500+ universities worldwide',
+      stat: '500+ Universities'
     },
     {
       icon: BookOpen,
       title: 'Training & Support',
-      description: 'Comprehensive training programs and ongoing support to ensure your success'
-    },
-    {
-      icon: Award,
-      title: 'Brand Recognition',
-      description: 'Leverage our established brand and reputation in the education industry'
-    },
-    {
-      icon: Target,
-      title: 'Marketing Support',
-      description: 'Professional marketing materials, digital campaigns, and lead generation support'
+      description: 'Complete training and ongoing support',
+      stat: '100% Success Rate'
     },
     {
       icon: Headphones,
       title: '24/7 Support',
-      description: 'Round-the-clock support for you and your students throughout the application process'
+      description: 'Round-the-clock support for you and students',
+      stat: 'Instant Response'
     }
   ];
 
+  const successStats = [
+    { number: '500+', label: 'Active Partners', icon: Users },
+    { number: '50,000+', label: 'Students Placed', icon: BookOpen },
+    { number: '95%', label: 'Success Rate', icon: Award },
+    { number: '24/7', label: 'Support Available', icon: Headphones }
+  ];
+
+
   const requirements = [
-    'Valid business license and registration',
-    'Minimum 2 years experience in education consultancy',
-    'Strong local network and market presence',
-    'Commitment to ethical business practices',
-    'Ability to provide excellent customer service',
-    'Basic understanding of international education systems'
+    'Valid business license',
+    '2+ years experience',
+    'Strong local network',
+    'Ethical business practices'
   ];
 
   const process = [
     {
       step: 1,
-      title: 'Application',
-      description: 'Submit your partnership application with required documents'
+      title: 'Apply',
+      description: 'Submit your application'
     },
     {
       step: 2,
-      title: 'Evaluation',
-      description: 'Our team reviews your application and conducts initial assessment'
+      title: 'Review',
+      description: 'We evaluate your application'
     },
     {
       step: 3,
       title: 'Interview',
-      description: 'Virtual interview to discuss partnership terms and expectations'
+      description: 'Virtual discussion'
     },
     {
       step: 4,
-      title: 'Training',
-      description: 'Comprehensive training program on our services and processes'
-    },
-    {
-      step: 5,
       title: 'Launch',
-      description: 'Official partnership launch with marketing support and materials'
+      description: 'Partnership begins'
     }
   ];
 
@@ -160,18 +149,19 @@ const PartnershipClient = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-              Join EduExpress International and expand your education consultancy business with our comprehensive study abroad solutions
+              Join EduExpress International and grow your education consultancy business
             </p>
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
             >
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => document.getElementById('partnership-form')?.scrollIntoView({ behavior: 'smooth' })}
                 className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-8 py-4 rounded-full text-lg transition-colors flex items-center justify-center space-x-2"
               >
                 <span>Apply Now</span>
@@ -185,6 +175,28 @@ const PartnershipClient = () => {
               >
                 Download Brochure
               </motion.button>
+            </motion.div>
+
+            {/* Success Statistics */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+            >
+              {successStats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                  className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
+                >
+                  <stat.icon className="w-8 h-8 text-yellow-300 mx-auto mb-2" />
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">{stat.number}</div>
+                  <div className="text-blue-100 text-sm">{stat.label}</div>
+                </motion.div>
+              ))}
             </motion.div>
           </motion.div>
         </div>
@@ -203,7 +215,7 @@ const PartnershipClient = () => {
               Partnership <span className="text-blue-600">Opportunities</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Choose the partnership model that best fits your business goals and market position
+              Choose the partnership model that fits your business
             </p>
           </motion.div>
 
@@ -265,11 +277,11 @@ const PartnershipClient = () => {
               Why Partner With <span className="text-blue-600">Us?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join thousands of successful partners who have grown their business with EduExpress International
+              Join successful partners who have grown their business with us
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {benefits.map((benefit, index) => (
               <motion.div
                 key={benefit.title}
@@ -286,14 +298,19 @@ const PartnershipClient = () => {
                   {benefit.title}
                 </h3>
                 
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed mb-3">
                   {benefit.description}
                 </p>
+
+                <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-sm font-semibold">
+                  {benefit.stat}
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
+
 
       {/* Requirements & Process */}
       <section className="py-20 px-6">
@@ -366,6 +383,29 @@ const PartnershipClient = () => {
         </div>
       </section>
 
+      {/* Partnership Form Section */}
+      <section id="partnership-form" className="py-20 px-6 bg-gray-50">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-6">
+              Ready to <span className="text-blue-600">Apply?</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Fill out our quick application form to get started.
+            </p>
+          </motion.div>
+
+          <PartnershipForm />
+        </div>
+      </section>
+
+
+
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600">
         <div className="container mx-auto text-center">
@@ -375,11 +415,11 @@ const PartnershipClient = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
-              Ready to Start Your <span className="text-yellow-300">Partnership Journey?</span>
+              Ready to <span className="text-yellow-300">Partner?</span>
             </h2>
             
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Join EduExpress International today and take your education consultancy business to the next level
+              Join EduExpress International today
             </p>
             
             <motion.div
@@ -391,6 +431,7 @@ const PartnershipClient = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => document.getElementById('partnership-form')?.scrollIntoView({ behavior: 'smooth' })}
                 className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-8 py-4 rounded-full text-lg transition-colors flex items-center justify-center space-x-2"
               >
                 <Briefcase className="w-5 h-5" />
@@ -400,6 +441,7 @@ const PartnershipClient = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => window.open('https://calendly.com/eduexpressint/partnership-consultation', '_blank')}
                 className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-bold px-8 py-4 rounded-full text-lg transition-colors flex items-center justify-center space-x-2"
               >
                 <Headphones className="w-5 h-5" />
