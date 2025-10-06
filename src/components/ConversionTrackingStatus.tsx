@@ -23,11 +23,11 @@ export default function ConversionTrackingStatus() {
     // Check tracking status
     const checkTrackingStatus = () => {
       const metaPixel = typeof window !== 'undefined' && 
-                       window.fbq && 
+                       typeof window.fbq === 'function' && 
                        process.env.NEXT_PUBLIC_META_PIXEL_ID !== '1234567890';
       
       const gtm = typeof window !== 'undefined' && 
-                  window.gtag && 
+                  typeof window.gtag === 'function' && 
                   process.env.NEXT_PUBLIC_GTM_ID !== 'GTM-XXXXXXX';
       
       const metaConversionAPI = !!process.env.META_ACCESS_TOKEN;
