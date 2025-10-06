@@ -461,6 +461,6 @@ const Home = memo(function Home() {
       <QuickContactForm />
     </div>
   );
-}
+});
 
 export default Home;
