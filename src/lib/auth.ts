@@ -1,6 +1,13 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+// Type assertion to ensure JWT_SECRET is defined
+const jwtSecret = JWT_SECRET as string;
 
 export interface AuthUser {
   userId: string;
@@ -10,7 +17,7 @@ export interface AuthUser {
 
 export function verifyToken(token: string): AuthUser | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, jwtSecret) as any;
     return {
       userId: decoded.userId,
       email: decoded.email,
@@ -30,7 +37,7 @@ export function verifyTokenFromRequest(request: Request): AuthUser | null {
 }
 
 export function generateToken(user: AuthUser): string {
-  return jwt.sign(user, JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign(user, jwtSecret, { expiresIn: '24h' });
 }
 
 export function getTokenFromRequest(request: Request): string | null {
