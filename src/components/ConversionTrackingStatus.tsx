@@ -21,7 +21,7 @@ export default function ConversionTrackingStatus() {
 
   useEffect(() => {
     // Check tracking status
-    const checkTrackingStatus = () => {
+    const checkTrackingStatus = async () => {
       const metaPixel = typeof window !== 'undefined' && 
                        typeof window.fbq === 'function' && 
                        process.env.NEXT_PUBLIC_META_PIXEL_ID !== '1234567890';
@@ -30,7 +30,17 @@ export default function ConversionTrackingStatus() {
                   typeof window.gtag === 'function' && 
                   process.env.NEXT_PUBLIC_GTM_ID !== 'GTM-XXXXXXX';
       
-      const metaConversionAPI = !!process.env.META_ACCESS_TOKEN;
+      // Check Meta Conversion API status via API call since META_ACCESS_TOKEN is server-side only
+      let metaConversionAPI = false;
+      try {
+        const response = await fetch('/api/test');
+        if (response.ok) {
+          const data = await response.json();
+          metaConversionAPI = data.metaConversionAPI || false;
+        }
+      } catch (error) {
+        console.log('Could not check Meta Conversion API status:', error);
+      }
 
       setStatus({
         metaPixel,

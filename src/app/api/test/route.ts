@@ -8,7 +8,10 @@ export async function GET(request: NextRequest) {
       status: 'connected',
       message: 'Database connection successful',
       timestamp: new Date().toISOString(),
-      mongodb_uri: process.env.MONGODB_URI ? 'configured' : 'not_configured'
+      mongodb_uri: process.env.MONGODB_URI ? 'configured' : 'not_configured',
+      metaConversionAPI: !!process.env.META_ACCESS_TOKEN,
+      metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID || 'not_configured',
+      gtmId: process.env.NEXT_PUBLIC_GTM_ID || 'not_configured'
     });
   } catch (error) {
     console.error('Database connection error:', error);
@@ -22,6 +25,9 @@ export async function GET(request: NextRequest) {
         error: errorMessage,
         type: isConnectionError ? 'connection_error' : 'database_error',
         mongodb_uri: process.env.MONGODB_URI ? 'configured' : 'not_configured',
+        metaConversionAPI: !!process.env.META_ACCESS_TOKEN,
+        metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID || 'not_configured',
+        gtmId: process.env.NEXT_PUBLIC_GTM_ID || 'not_configured',
         timestamp: new Date().toISOString()
       },
       { status: 500 }
