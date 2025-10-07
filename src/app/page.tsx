@@ -509,23 +509,23 @@ const Home = memo(function Home() {
               <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 animate-pulse"></div>
               </div>
-              {/* Enhanced Navigation Buttons with Glow Effects */}
+              {/* Enhanced Navigation Buttons with Glow Effects - Mobile Responsive */}
               <button
                 onClick={goToPreviousSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-2 sm:p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Previous destinations"
               >
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300 blur-sm"></div>
-                <ChevronLeft className="relative w-6 h-6 group-hover:-translate-x-1 transition-transform duration-200" />
+                <ChevronLeft className="relative w-4 h-4 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-200" />
               </button>
               
               <button
                 onClick={goToNextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 rounded-full p-2 sm:p-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 backdrop-blur-md border border-white/30 hover:border-blue-300/50 opacity-90 hover:opacity-100 group min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Next destinations"
               >
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300 blur-sm"></div>
-                <ChevronRight className="relative w-6 h-6 group-hover:translate-x-1 transition-transform duration-200" />
+                <ChevronRight className="relative w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-200" />
               </button>
 
               {/* Carousel Container - One Card Per Slide */}
@@ -537,13 +537,13 @@ const Home = memo(function Home() {
                   }}
                 >
                   {featuredCountries.map((country, index) => (
-                    <div key={country.name} className="w-full flex-shrink-0 px-10 py-10">
+                    <div key={country.name} className="w-full flex-shrink-0 px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10">
                       <div className="flex justify-center">
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 }}
-                          className="group bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-105 cursor-pointer border border-white/30 hover:border-indigo-300/60 relative overflow-hidden max-w-lg w-full"
+                          className="group bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl hover:shadow-3xl transition-all duration-700 hover:scale-105 cursor-pointer border border-white/30 hover:border-indigo-300/60 relative overflow-hidden max-w-sm sm:max-w-md lg:max-w-lg w-full"
                           onClick={() => {
                             trackApplicationStart(`country_${country.name.toLowerCase()}`);
                             window.dispatchEvent(new CustomEvent('openQuickForm'));
@@ -564,40 +564,41 @@ const Home = memo(function Home() {
                           </div>
                           
                           <div className="text-center relative z-10">
-                            {/* Enhanced flag with glow effect */}
-                            <div className="relative mb-10">
+                            {/* Enhanced flag with glow effect - Mobile Responsive */}
+                            <div className="relative mb-6 sm:mb-8 lg:mb-10">
                               <motion.div 
-                                className="text-9xl mb-3 group-hover:scale-110 transition-transform duration-500 filter group-hover:drop-shadow-2xl group-hover:brightness-110"
+                                className="text-6xl sm:text-7xl lg:text-9xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-500 filter group-hover:drop-shadow-2xl group-hover:brightness-110"
                                 whileHover={{ scale: 1.15, rotate: 5 }}
                               >
                                 {country.flag}
                               </motion.div>
                               {/* Subtle glow effect behind flag */}
-                              <div className="absolute inset-0 text-9xl opacity-0 group-hover:opacity-25 transition-opacity duration-500 blur-sm">
+                              <div className="absolute inset-0 text-6xl sm:text-7xl lg:text-9xl opacity-0 group-hover:opacity-25 transition-opacity duration-500 blur-sm">
                                 {country.flag}
                               </div>
                             </div>
                             
-                            {/* Enhanced title with gradient text */}
-                            <h3 className="text-3xl font-bold mb-6 leading-tight bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:via-purple-600 group-hover:to-pink-600 transition-all duration-500">
+                            {/* Enhanced title with gradient text - Mobile Responsive */}
+                            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-5 lg:mb-6 leading-tight bg-gradient-to-r from-gray-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:via-purple-600 group-hover:to-pink-600 transition-all duration-500">
                               {country.name}
                             </h3>
                             
-                            {/* Enhanced description with better typography */}
-                            <p className="text-lg text-gray-600 mb-10 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed font-medium">
+                            {/* Enhanced description with better typography - Mobile Responsive */}
+                            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 lg:mb-10 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed font-medium">
                               {country.description}
                             </p>
                             
-                            {/* Enhanced CTA button with gradient background */}
+                            {/* Enhanced CTA button with gradient background - Mobile Responsive */}
                             <div className="relative">
                               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur opacity-0 group-hover:opacity-80 transition-opacity duration-500"></div>
                               <motion.div 
-                                className="relative inline-flex items-center text-white font-bold text-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 group-hover:from-indigo-500 group-hover:via-purple-500 group-hover:to-pink-500 px-10 py-5 rounded-full transition-all duration-300 shadow-xl group-hover:shadow-2xl"
+                                className="relative inline-flex items-center text-white font-bold text-sm sm:text-base lg:text-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 group-hover:from-indigo-500 group-hover:via-purple-500 group-hover:to-pink-500 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full transition-all duration-300 shadow-xl group-hover:shadow-2xl"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                               >
-                                Explore {country.name}
-                                <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                                <span className="hidden sm:inline">Explore {country.name}</span>
+                                <span className="sm:hidden">Explore</span>
+                                <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-300" />
                               </motion.div>
                             </div>
                           </div>
@@ -608,76 +609,8 @@ const Home = memo(function Home() {
                 </div>
               </div>
 
-              {/* Enhanced Progress Indicators with Modern Design */}
-              <div className="flex justify-center space-x-6 pb-10">
-                {featuredCountries.map((country, index) => (
-                  <motion.button
-                    key={country.name}
-                    onClick={() => goToSlide(index)}
-                    className={`relative w-5 h-5 rounded-full transition-all duration-500 ${
-                      index === currentCarouselSlide 
-                        ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 scale-125 shadow-2xl' 
-                        : 'bg-gray-300/60 hover:bg-indigo-400/80 hover:scale-110 backdrop-blur-sm'
-                    }`}
-                    aria-label={`Go to ${country.name}`}
-                    title={country.name}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {index === currentCarouselSlide && (
-                      <>
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 animate-ping opacity-60"></div>
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 blur-sm"></div>
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-pink-500/30 blur-md"></div>
-                      </>
-                    )}
-                    {index !== currentCarouselSlide && (
-                      <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                    )}
-                  </motion.button>
-                ))}
-              </div>
             </div>
 
-            {/* Enhanced Carousel Info */}
-            <div className="text-center mt-8">
-              <motion.p 
-                className="text-sm text-gray-600 font-medium mb-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-              >
-                Use arrow keys, swipe, or click the navigation buttons to explore each destination
-              </motion.p>
-              <div className="flex items-center justify-center space-x-6 text-xs text-gray-500 font-medium">
-                <motion.span 
-                  className="flex items-center bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <ChevronLeft className="w-3 h-3 mr-1" />
-                  Previous
-                </motion.span>
-                <motion.span 
-                  className="flex items-center bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Next
-                  <ChevronRight className="w-3 h-3 ml-1" />
-                </motion.span>
-                <span className="text-gray-400">•</span>
-                <span className="bg-white/60 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50">
-                  Click dots to jump to specific country
-                </span>
-              </div>
-              <motion.p 
-                className="text-sm text-gray-500 mt-4 font-medium"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2 }}
-              >
-                Showing {currentCarouselSlide + 1} of {featuredCountries.length} destinations
-              </motion.p>
-            </div>
           </div>
         </div>
       </section>

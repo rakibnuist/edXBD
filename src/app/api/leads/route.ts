@@ -9,6 +9,23 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     
+    // Validate required fields
+    if (!body.name || !body.email || !body.phone || !body.country) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, email, phone, and country are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(body.email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+    
     // Create new lead
     const lead = new Lead({
       ...body,
@@ -42,9 +59,27 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    // Error creating lead
+    console.error('Lead submission error:', error);
+    
+    // Handle specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('duplicate key')) {
+        return NextResponse.json(
+          { error: 'A lead with this email already exists' },
+          { status: 409 }
+        );
+      }
+      if (error.message.includes('validation')) {
+        return NextResponse.json(
+          { error: 'Invalid data provided' },
+          { status: 400 }
+        );
+      }
+    }
+    
+    // Generic error response
     return NextResponse.json(
-      { error: 'Failed to submit lead' },
+      { error: 'Failed to submit lead. Please try again.' },
       { status: 500 }
     );
   }

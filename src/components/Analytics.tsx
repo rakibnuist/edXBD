@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
-import { initGTM, initMetaPixel, GTM_ID, META_PIXEL_ID } from '@/lib/analytics';
+import { initGTM, initGA4, initMetaPixel, GTM_ID, GA4_MEASUREMENT_ID, META_PIXEL_ID } from '@/lib/analytics';
 
 const Analytics = () => {
   useEffect(() => {
     // Initialize tracking on client side
     initGTM();
+    initGA4();
     initMetaPixel();
   }, []);
 
@@ -50,8 +51,20 @@ const Analytics = () => {
 
       {/* Google Analytics 4 */}
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
         strategy="afterInteractive"
+      />
+      <Script
+        id="ga4-config"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA4_MEASUREMENT_ID}');
+          `,
+        }}
       />
 
       {/* Noscript fallback for GTM */}

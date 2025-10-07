@@ -15,12 +15,6 @@ const ConditionalHeader = () => {
   // Hide header for admin and dashboard routes
   const shouldHideHeader = isClient && (pathname.startsWith('/admin') || pathname.startsWith('/dashboard'));
   
-  // Debug log
-  useEffect(() => {
-    if (isClient) {
-      console.log('ConditionalHeader - pathname:', pathname, 'shouldHideHeader:', shouldHideHeader);
-    }
-  }, [pathname, shouldHideHeader, isClient]);
   
   // Add/remove class to body for dashboard routes
   useEffect(() => {

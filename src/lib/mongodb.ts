@@ -6,16 +6,16 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Type assertion to ensure MONGODB_URI is defined
-const mongoUri = MONGODB_URI as string;
-
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections growing exponentially
  * during API Route usage.
  */
 declare global {
-  var mongoose: { conn: unknown; promise: Promise<unknown> | null } | null; // This must be a `var` and not a `let / const`
+  var mongoose: { 
+    conn: any | null; 
+    promise: Promise<any> | null 
+  } | undefined;
 }
 
 let cached = global.mongoose;
@@ -38,7 +38,7 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(mongoUri, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongoose) => {
       console.log('✅ MongoDB connected successfully');
       return mongoose;
     }).catch((error) => {

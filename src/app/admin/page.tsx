@@ -59,7 +59,6 @@ export default function AdminDashboard() {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('Dashboard data:', data); // Debug log
         setStats(data);
         trackDatabaseOperation('fetch_dashboard_data', true, {
           total_leads: data.totalLeads,

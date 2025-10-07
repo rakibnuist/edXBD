@@ -134,7 +134,8 @@ module.exports = {
     },
   },
   plugins: [
-    require('@tailwindcss/line-clamp'),
+    // @tailwindcss/line-clamp is now built-in to Tailwind CSS v4
+    // No plugins needed for line-clamp functionality
   ],
 }
 
