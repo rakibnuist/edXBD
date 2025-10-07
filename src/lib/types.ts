@@ -74,7 +74,7 @@ export interface Lead {
   country: string;
   program: string;
   message?: string;
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'closed';
+  status: 'new' | 'contacted' | 'consultation_scheduled' | 'consultation_completed' | 'qualified' | 'application_started' | 'application_submitted' | 'admission_received' | 'visa_applied' | 'visa_approved' | 'enrolled' | 'converted' | 'not_interested' | 'closed';
   source: string;
   assignedTo?: string;
   notes?: string;

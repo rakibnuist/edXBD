@@ -163,8 +163,7 @@ export default function UpdateClient({ update }: UpdateClientProps) {
                 className="cta-title text-4xl sm:text-5xl font-bold drop-shadow-2xl shadow-black/50 bg-black/20 backdrop-blur-sm px-8 py-4 rounded-2xl border border-white/10" 
                 style={{
                   color: '#ffffff',
-                  WebkitTextFillColor: '#ffffff',
-                  textFillColor: '#ffffff'
+                  WebkitTextFillColor: '#ffffff'
                 }}
               >
                 Ready to Start Your Journey?

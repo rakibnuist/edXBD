@@ -22,7 +22,6 @@ import AnimatedButton from '@/components/AnimatedButton';
 import { fadeInUp, fadeInDown, scaleIn, staggerContainer, staggerItem, float } from '@/lib/animations';
 
 // Import components normally for now - lazy loading can be added later
-import WhatsAppWidget from '@/components/WhatsAppWidget';
 import QuickContactForm from '@/components/QuickContactForm';
 import { Testimonial, Update } from '@/lib/types';
 import { featuredCountries } from '@/lib/countries';
@@ -921,7 +920,6 @@ const Home = memo(function Home() {
       </section>
 
       {/* Optimized components */}
-      <WhatsAppWidget />
       <QuickContactForm />
     </div>
   );

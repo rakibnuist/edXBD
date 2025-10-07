@@ -52,6 +52,38 @@ export default function robots(): MetadataRoute.Robots {
           '/init-updates'
         ],
         crawlDelay: 1,
+      },
+      {
+        userAgent: 'OpenAI',
+        allow: '/',
+        disallow: [
+          '/private/',
+          '/admin/',
+          '/api/',
+          '/dashboard/',
+          '/login',
+          '/setup/',
+          '/test/',
+          '/init-db',
+          '/init-updates'
+        ],
+        crawlDelay: 2,
+      },
+      {
+        userAgent: 'GPTBot',
+        allow: '/',
+        disallow: [
+          '/private/',
+          '/admin/',
+          '/api/',
+          '/dashboard/',
+          '/login',
+          '/setup/',
+          '/test/',
+          '/init-db',
+          '/init-updates'
+        ],
+        crawlDelay: 2,
       }
     ],
     sitemap: 'https://www.eduexpressint.com/sitemap.xml',

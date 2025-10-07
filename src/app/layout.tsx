@@ -10,6 +10,7 @@ import PageTransition from "@/components/PageTransition";
 import ScrollToTop from "@/components/ScrollToTop";
 import PerformanceOptimizer from "@/components/PerformanceOptimizer";
 import MobileOptimizer from "@/components/MobileOptimizer";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import "./globals.css";
 
 // Primary font for body text and UI elements
@@ -349,6 +350,10 @@ export default function RootLayout({
         <Footer />
         <QuickContactForm />
         <ScrollToTop />
+        <FloatingWhatsApp 
+          phoneNumber="+8801983333566"
+          message="Hi! I'm interested in studying abroad. Can you help me with information about universities and scholarships?"
+        />
       </body>
     </html>
   );

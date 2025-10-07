@@ -297,6 +297,267 @@ export const trackContact = async (
   return await sendConversionAPIEvent('Contact', userData || {}, customData, eventId, request);
 };
 
+// Education Consultancy Lead Status Tracking
+export const trackLeadStatusChange = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    previousStatus?: string;
+    newStatus: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  // Map status to appropriate Meta event and custom data
+  const statusEventMapping = {
+    'new': { event: 'Lead', value: 0, category: 'Initial Inquiry' },
+    'contacted': { event: 'Contact', value: 0, category: 'First Contact' },
+    'consultation_scheduled': { event: 'Schedule', value: 0, category: 'Consultation Scheduled' },
+    'consultation_completed': { event: 'ViewContent', value: 0, category: 'Consultation Completed' },
+    'qualified': { event: 'ViewContent', value: 0, category: 'Lead Qualified' },
+    'application_started': { event: 'InitiateCheckout', value: 0, category: 'Application Started' },
+    'application_submitted': { event: 'AddToCart', value: 0, category: 'Application Submitted' },
+    'admission_received': { event: 'Purchase', value: 1000, category: 'Admission Received' },
+    'visa_applied': { event: 'Purchase', value: 1500, category: 'Visa Application' },
+    'visa_approved': { event: 'Purchase', value: 2000, category: 'Visa Approved' },
+    'enrolled': { event: 'Purchase', value: 5000, category: 'Student Enrolled' },
+    'converted': { event: 'Purchase', value: 5000, category: 'Conversion Complete' },
+    'not_interested': { event: 'Contact', value: 0, category: 'Not Interested' },
+    'closed': { event: 'Contact', value: 0, category: 'Lead Closed' }
+  };
+
+  const mapping = statusEventMapping[leadData.newStatus as keyof typeof statusEventMapping] || 
+                  { event: 'Contact', value: 0, category: 'Status Update' };
+
+  const customData = {
+    content_name: `Lead Status: ${leadData.newStatus.replace('_', ' ').toUpperCase()}`,
+    content_category: mapping.category,
+    lead_status: leadData.newStatus,
+    previous_status: leadData.previousStatus || 'unknown',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    value: mapping.value,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent(mapping.event, userData, customData, eventId, request);
+};
+
+// Track consultation booking
+export const trackConsultationBooking = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    consultationType?: string;
+    scheduledDate?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  const customData = {
+    content_name: 'Consultation Booking',
+    content_category: 'Education Consultation',
+    consultation_type: leadData.consultationType || 'general',
+    scheduled_date: leadData.scheduledDate || 'not_specified',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Schedule', userData, customData, eventId, request);
+};
+
+// Track application submission
+export const trackApplicationSubmission = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    university?: string;
+    applicationFee?: number;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  const customData = {
+    content_name: 'University Application Submitted',
+    content_category: 'Application Process',
+    university_name: leadData.university || 'not_specified',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    application_fee: leadData.applicationFee || 0,
+    value: leadData.applicationFee || 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('AddToCart', userData, customData, eventId, request);
+};
+
+// Track admission received
+export const trackAdmissionReceived = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    university?: string;
+    admissionValue?: number;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  const customData = {
+    content_name: 'University Admission Received',
+    content_category: 'Admission Success',
+    university_name: leadData.university || 'not_specified',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    admission_value: leadData.admissionValue || 1000,
+    value: leadData.admissionValue || 1000,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Purchase', userData, customData, eventId, request);
+};
+
+// Track visa approval
+export const trackVisaApproval = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    university?: string;
+    visaValue?: number;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  const customData = {
+    content_name: 'Student Visa Approved',
+    content_category: 'Visa Success',
+    university_name: leadData.university || 'not_specified',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    visa_value: leadData.visaValue || 2000,
+    value: leadData.visaValue || 2000,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Purchase', userData, customData, eventId, request);
+};
+
+// Track enrollment completion
+export const trackEnrollmentCompletion = async (
+  leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    country?: string;
+    program?: string;
+    university?: string;
+    enrollmentValue?: number;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = leadData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const userData = {
+    email: leadData.email,
+    phone: leadData.phone,
+    firstName: firstName,
+    lastName: lastName,
+    country: leadData.country,
+  };
+
+  const customData = {
+    content_name: 'Student Enrollment Complete',
+    content_category: 'Enrollment Success',
+    university_name: leadData.university || 'not_specified',
+    study_destination: leadData.country || 'not_specified',
+    program_interest: leadData.program || 'not_specified',
+    enrollment_value: leadData.enrollmentValue || 5000,
+    value: leadData.enrollmentValue || 5000,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Purchase', userData, customData, eventId, request);
+};
+
 // Test event for debugging
 export const testConversionAPI = async (
   request?: Request

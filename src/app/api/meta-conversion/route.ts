@@ -6,6 +6,12 @@ import {
   trackViewContent,
   trackCompleteRegistration,
   trackContact,
+  trackLeadStatusChange,
+  trackConsultationBooking,
+  trackApplicationSubmission,
+  trackAdmissionReceived,
+  trackVisaApproval,
+  trackEnrollmentCompletion,
   testConversionAPI
 } from '@/lib/meta-conversion-api';
 
@@ -39,6 +45,30 @@ export async function POST(request: NextRequest) {
       
       case 'contact':
         result = await trackContact(data.contactMethod, data.userData, request);
+        break;
+      
+      case 'lead_status_change':
+        result = await trackLeadStatusChange(data.leadData, request);
+        break;
+      
+      case 'consultation_booking':
+        result = await trackConsultationBooking(data.leadData, request);
+        break;
+      
+      case 'application_submission':
+        result = await trackApplicationSubmission(data.leadData, request);
+        break;
+      
+      case 'admission_received':
+        result = await trackAdmissionReceived(data.leadData, request);
+        break;
+      
+      case 'visa_approval':
+        result = await trackVisaApproval(data.leadData, request);
+        break;
+      
+      case 'enrollment_completion':
+        result = await trackEnrollmentCompletion(data.leadData, request);
         break;
       
       case 'test':

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Lead } from '@/lib/types';
+import { trackLeadStatusChange } from '@/lib/meta-conversion-api';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 export default function UserLeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -68,6 +70,24 @@ export default function UserLeadsPage() {
       });
 
       if (response.ok) {
+        // Track status change with enhanced Meta Conversion API
+        const lead = leads.find(l => l._id === leadId);
+        if (lead) {
+          try {
+            await trackLeadStatusChange({
+              name: lead.name,
+              email: lead.email,
+              phone: lead.phone,
+              country: lead.country,
+              program: lead.program,
+              previousStatus: lead.status,
+              newStatus: newStatus
+            });
+          } catch (conversionError) {
+            console.error('Meta Conversion API error for status update:', conversionError);
+          }
+        }
+
         // Update local state immediately for better UX
         setLeads(prevLeads => 
           prevLeads.map(lead => 
@@ -97,18 +117,12 @@ export default function UserLeadsPage() {
     }
   };
 
-  const handleWhatsApp = (phoneNumber: string, leadName: string) => {
-    if (phoneNumber) {
-      // Remove any non-numeric characters and ensure it starts with country code
-      const cleanPhone = phoneNumber.replace(/\D/g, '');
-      const whatsappPhone = cleanPhone.startsWith('880') ? cleanPhone : `880${cleanPhone}`;
-      
-      // Create a personalized message
-      const message = encodeURIComponent(`Hi ${leadName}! This is EduExpress International. I'm reaching out regarding your study abroad inquiry. How can I help you today?`);
-      
-      // Open WhatsApp with the message
-      window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
-    }
+  const handleWhatsAppTracking = async (data: any) => {
+    // Track WhatsApp interaction for user dashboard
+    console.log('WhatsApp contact tracked:', data);
+    
+    // You can add additional tracking here if needed
+    // For example, send to analytics service
   };
 
   const deleteLead = async (leadId: string) => {
@@ -133,18 +147,21 @@ export default function UserLeadsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'new':
-        return 'bg-blue-100 text-blue-800';
-      case 'contacted':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'qualified':
-        return 'bg-green-100 text-green-800';
-      case 'converted':
-        return 'bg-purple-100 text-purple-800';
-      case 'closed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'new': return 'bg-green-100 text-green-800';
+      case 'contacted': return 'bg-blue-100 text-blue-800';
+      case 'consultation_scheduled': return 'bg-indigo-100 text-indigo-800';
+      case 'consultation_completed': return 'bg-purple-100 text-purple-800';
+      case 'qualified': return 'bg-yellow-100 text-yellow-800';
+      case 'application_started': return 'bg-orange-100 text-orange-800';
+      case 'application_submitted': return 'bg-amber-100 text-amber-800';
+      case 'admission_received': return 'bg-emerald-100 text-emerald-800';
+      case 'visa_applied': return 'bg-teal-100 text-teal-800';
+      case 'visa_approved': return 'bg-cyan-100 text-cyan-800';
+      case 'enrolled': return 'bg-green-100 text-green-800';
+      case 'converted': return 'bg-purple-100 text-purple-800';
+      case 'not_interested': return 'bg-red-100 text-red-800';
+      case 'closed': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -197,8 +214,17 @@ export default function UserLeadsPage() {
               <option value="all">All Statuses</option>
               <option value="new">New</option>
               <option value="contacted">Contacted</option>
+              <option value="consultation_scheduled">Consultation Scheduled</option>
+              <option value="consultation_completed">Consultation Completed</option>
               <option value="qualified">Qualified</option>
+              <option value="application_started">Application Started</option>
+              <option value="application_submitted">Application Submitted</option>
+              <option value="admission_received">Admission Received</option>
+              <option value="visa_applied">Visa Applied</option>
+              <option value="visa_approved">Visa Approved</option>
+              <option value="enrolled">Enrolled</option>
               <option value="converted">Converted</option>
+              <option value="not_interested">Not Interested</option>
               <option value="closed">Closed</option>
             </select>
           </div>
@@ -277,16 +303,16 @@ export default function UserLeadsPage() {
                           >
                             📞 {lead.phone}
                           </button>
-                          <button
-                            onClick={() => handleWhatsApp(lead.phone, lead.name)}
-                            className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium text-white bg-green-500 hover:bg-green-600 rounded shadow-sm transition-colors duration-200 hover:shadow-md"
-                            title="Send WhatsApp message"
-                          >
-                            <svg className="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                            </svg>
-                            WA
-                          </button>
+                          <WhatsAppButton
+                            phoneNumber={lead.phone}
+                            leadName={lead.name}
+                            leadCountry={lead.country}
+                            leadProgram={lead.program}
+                            leadStatus={lead.status}
+                            size="small"
+                            showText={true}
+                            onTrack={handleWhatsAppTracking}
+                          />
                         </div>
                       )}
                       {/* Mobile: Show country and source below contact info */}
@@ -311,8 +337,17 @@ export default function UserLeadsPage() {
                     >
                       <option value="new">New</option>
                       <option value="contacted">Contacted</option>
+                      <option value="consultation_scheduled">Consultation Scheduled</option>
+                      <option value="consultation_completed">Consultation Completed</option>
                       <option value="qualified">Qualified</option>
+                      <option value="application_started">Application Started</option>
+                      <option value="application_submitted">Application Submitted</option>
+                      <option value="admission_received">Admission Received</option>
+                      <option value="visa_applied">Visa Applied</option>
+                      <option value="visa_approved">Visa Approved</option>
+                      <option value="enrolled">Enrolled</option>
                       <option value="converted">Converted</option>
+                      <option value="not_interested">Not Interested</option>
                       <option value="closed">Closed</option>
                     </select>
                   </td>
@@ -384,16 +419,18 @@ export default function UserLeadsPage() {
                           >
                             📞 {selectedLead.phone}
                           </button>
-                          <button
-                            onClick={() => handleWhatsApp(selectedLead.phone, selectedLead.name)}
-                            className="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-green-500 hover:bg-green-600 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:scale-105"
-                            title="Send WhatsApp message"
-                          >
-                            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                            </svg>
-                            WhatsApp
-                          </button>
+                          <WhatsAppButton
+                            phoneNumber={selectedLead.phone}
+                            leadName={selectedLead.name}
+                            leadCountry={selectedLead.country}
+                            leadProgram={selectedLead.program}
+                            leadStatus={selectedLead.status}
+                            size="medium"
+                            variant="default"
+                            showText={true}
+                            onTrack={handleWhatsAppTracking}
+                            className="w-full sm:w-auto"
+                          />
                         </div>
                       ) : (
                         <p className="text-xs sm:text-sm text-gray-500">Not provided</p>
@@ -434,7 +471,7 @@ export default function UserLeadsPage() {
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Update Status</label>
                   <div className="flex flex-wrap gap-2">
-                    {['new', 'contacted', 'qualified', 'converted', 'closed'].map((status) => (
+                    {['new', 'contacted', 'consultation_scheduled', 'consultation_completed', 'qualified', 'application_started', 'application_submitted', 'admission_received', 'visa_applied', 'visa_approved', 'enrolled', 'converted', 'not_interested', 'closed'].map((status) => (
                       <button
                         key={status}
                         onClick={() => updateLeadStatus(selectedLead._id, status)}
@@ -444,7 +481,7 @@ export default function UserLeadsPage() {
                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                       >
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </button>
                     ))}
                   </div>
