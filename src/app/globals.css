@@ -70,7 +70,7 @@ html {
 body {
   background: var(--bg-white);
   color: var(--text-dark);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -80,21 +80,21 @@ body {
 
 /* Professional Typography System */
 .font-heading {
-  font-family: var(--font-playfair-display), Georgia, serif;
+  font-family: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
 
 .font-body {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair-display), Georgia, serif;
+  font-family: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.01em;
@@ -103,28 +103,28 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Professional Font Classes */
 .font-primary {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.6;
 }
 
 .font-primary-medium {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1.5;
 }
 
 .font-primary-semibold {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.4;
 }
 
 .font-primary-bold {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1.3;
@@ -133,7 +133,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Professional Typography Styles */
 .heading-creative {
-  font-family: var(--font-playfair-display), Georgia, serif;
+  font-family: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -144,7 +144,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .heading-minimal {
-  font-family: var(--font-playfair-display), Georgia, serif;
+  font-family: var(--font-playfair-display), 'Playfair Display', Georgia, serif;
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -152,7 +152,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-minimal {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   letter-spacing: 0.01em;
   line-height: 1.6;
@@ -166,7 +166,7 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   border-radius: 50px;
   padding: 16px 32px;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
   font-weight: 600;
   font-size: 18px;
   cursor: pointer;
@@ -193,7 +193,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #2563eb;
   border-radius: 50px;
   padding: 16px 32px;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 600;
   font-size: 18px;
   cursor: pointer;
@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
   border-radius: 50px;
   padding: 16px 40px;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 600;
   font-size: 18px;
   cursor: pointer;
@@ -604,8 +604,9 @@ a:focus {
   transform: translateY(0);
 }
 
-/* Mobile Optimizations */
+/* Enhanced Mobile Optimizations */
 @media (max-width: 768px) {
+  /* Performance optimizations */
   .glass-effect {
     backdrop-filter: blur(5px);
   }
@@ -682,6 +683,216 @@ a:focus {
   
   .shadow-3xl {
     box-shadow: 0 15px 35px -3px rgba(0, 0, 0, 0.1), 0 6px 8px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Enhanced mobile touch targets */
+  button, a, input, select, textarea {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Mobile-specific spacing improvements */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Mobile navigation improvements */
+  .mobile-nav-item {
+    min-height: 56px;
+    padding: 16px 20px;
+    font-size: 18px;
+  }
+
+  /* Mobile form improvements */
+  .mobile-form-input {
+    min-height: 56px;
+    padding: 16px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  /* Mobile card improvements */
+  .mobile-card {
+    margin: 0.75rem;
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  /* Mobile text improvements */
+  .mobile-text-large {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .mobile-text-small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Mobile spacing utilities */
+  .mobile-p-4 {
+    padding: 1rem;
+  }
+
+  .mobile-p-6 {
+    padding: 1.5rem;
+  }
+
+  .mobile-m-4 {
+    margin: 1rem;
+  }
+
+  .mobile-m-6 {
+    margin: 1.5rem;
+  }
+
+  /* Mobile flex improvements */
+  .mobile-flex-col {
+    flex-direction: column;
+  }
+
+  .mobile-flex-center {
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Mobile grid improvements */
+  .mobile-grid-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  /* Mobile overflow handling */
+  .mobile-overflow-hidden {
+    overflow: hidden;
+  }
+
+  .mobile-overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile scroll improvements */
+  .mobile-scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  h1 {
+    font-size: 2rem !important;
+    line-height: 1.1 !important;
+  }
+  
+  h2 {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h3 {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Extra small mobile touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Extra small mobile spacing */
+  .mobile-p-2 {
+    padding: 0.5rem;
+  }
+
+  .mobile-p-3 {
+    padding: 0.75rem;
+  }
+
+  .mobile-m-2 {
+    margin: 0.5rem;
+  }
+
+  .mobile-m-3 {
+    margin: 0.75rem;
+  }
+
+  /* Extra small mobile text */
+  .mobile-text-xs {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .mobile-text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+/* Mobile landscape orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-landscape-hide {
+    display: none;
+  }
+
+  .mobile-landscape-show {
+    display: block;
+  }
+
+  /* Adjust header height for landscape */
+  .header-height-compensation {
+    padding-top: 5rem;
+  }
+}
+
+/* High DPI mobile displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mobile-hidpi-optimize {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Mobile accessibility improvements */
+@media (max-width: 768px) {
+  /* Focus indicators for mobile */
+  *:focus {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .mobile-high-contrast {
+      border: 2px solid #000;
+      background-color: #fff;
+      color: #000;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-reduced-motion {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 }
 

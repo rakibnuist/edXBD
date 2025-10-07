@@ -31,6 +31,7 @@ export interface Update {
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
+  views?: number;
 }
 
 export interface UpdatesResponse {

@@ -9,7 +9,7 @@ import { fadeInUp, staggerContainer, staggerItem, iconBounce } from '@/lib/anima
 import { countries } from '@/lib/countries';
 
 const Footer = () => {
-  const [currentYear, setCurrentYear] = useState(2024);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -54,10 +54,10 @@ const Footer = () => {
         }} />
       </div>
 
-      <div className="relative container mx-auto px-4 sm:px-6 py-12">
-        {/* Main Content */}
+      <div className="relative container mx-auto mobile-p-4 sm:px-6 py-12">
+        {/* Enhanced Mobile Main Content */}
         <motion.div 
-          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-8 sm:mb-12"
+          className="grid mobile-grid-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 mb-8 sm:mb-12"
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
@@ -80,6 +80,7 @@ const Footer = () => {
                   width={72}
                   height={48}
                   className="h-full w-auto object-contain"
+                  style={{ width: 'auto', height: '100%' }}
                 />
               </div>
             </motion.div>
@@ -89,15 +90,15 @@ const Footer = () => {
               Helping students achieve their international education dreams since 2018.
             </p>
 
-            {/* Social Links */}
-            <div className="flex space-x-4">
+            {/* Enhanced Mobile Social Links */}
+            <div className="flex space-x-4 mobile-flex-center">
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-blue-500 hover:scale-110 transition-all duration-300 border border-white/20"
+                  className="group w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-blue-500 hover:scale-110 transition-all duration-300 border border-white/20 touch-manipulation active:scale-95"
                   aria-label={social.name}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -117,9 +118,9 @@ const Footer = () => {
             </div>
           </motion.div>
 
-          {/* Links Section */}
+          {/* Enhanced Mobile Links Section */}
           <motion.div 
-            className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
+            className="lg:col-span-8 grid mobile-grid-1 md:grid-cols-3 gap-6 lg:gap-8"
             variants={staggerItem}
           >
             {/* Quick Links */}
@@ -148,7 +149,7 @@ const Footer = () => {
                   >
                     <Link
                       href={link.href}
-                      className="block text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm"
+                      className="text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2"
                     >
                       {link.name}
                     </Link>
@@ -168,7 +169,7 @@ const Footer = () => {
                   <Link
                     key={country.slug}
                     href={`/destinations/${country.slug}`}
-                    className="block text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm"
+                    className="text-gray-300 hover:text-blue-400 transition-colors duration-200 hover:translate-x-1 transform text-sm min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2"
                   >
                     {country.name}
                   </Link>
@@ -176,7 +177,7 @@ const Footer = () => {
                 {destinations.length > 6 && (
                   <Link
                     href="/destinations"
-                    className="block text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium text-sm"
+                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium text-sm min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2"
                   >
                     View All →
                   </Link>
@@ -206,7 +207,7 @@ const Footer = () => {
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <a href="tel:+8801983333566" className="text-gray-300 hover:text-blue-400 transition-colors text-xs block truncate">
+                      <a href="tel:+8801983333566" className="text-gray-300 hover:text-blue-400 transition-colors text-xs truncate min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2">
                         +880 1983-333566
                       </a>
                     </div>
@@ -214,7 +215,7 @@ const Footer = () => {
                       href="https://wa.me/8801983333566" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-7 h-7 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors group flex-shrink-0"
+                      className="w-7 h-7 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors group flex-shrink-0 touch-manipulation active:scale-95"
                       aria-label="WhatsApp +880 1983-333566"
                     >
                       <MessageCircle className="w-3 h-3 text-white group-hover:scale-110 transition-transform" />
@@ -224,7 +225,7 @@ const Footer = () => {
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <a href="tel:+88013296663505" className="text-gray-300 hover:text-blue-400 transition-colors text-xs block truncate">
+                      <a href="tel:+88013296663505" className="text-gray-300 hover:text-blue-400 transition-colors text-xs truncate min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2">
                         +880 1329-6663505
                       </a>
                     </div>
@@ -232,7 +233,7 @@ const Footer = () => {
                       href="https://wa.me/88013296663505" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-7 h-7 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors group flex-shrink-0"
+                      className="w-7 h-7 bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors group flex-shrink-0 touch-manipulation active:scale-95"
                       aria-label="WhatsApp +880 1329-6663505"
                     >
                       <MessageCircle className="w-3 h-3 text-white group-hover:scale-110 transition-transform" />
@@ -242,7 +243,7 @@ const Footer = () => {
                 
                 <div className="flex items-center space-x-2">
                   <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                  <a href="mailto:info@eduexpressint.com" className="text-gray-300 hover:text-blue-400 transition-colors text-xs truncate">
+                  <a href="mailto:info@eduexpressint.com" className="text-gray-300 hover:text-blue-400 transition-colors text-xs truncate min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2">
                     info@eduexpressint.com
                   </a>
                 </div>
@@ -251,19 +252,19 @@ const Footer = () => {
           </motion.div>
         </motion.div>
 
-        {/* Bottom Section */}
+        {/* Enhanced Mobile Bottom Section */}
         <div className="border-t border-white/10 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-2 text-gray-400">
-              <span>© {currentYear} EduExpress International. Made with</span>
+          <div className="flex mobile-flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-2 text-gray-400 mobile-text-small">
+              <span>© {currentYear || new Date().getFullYear()} EduExpress International. Made with</span>
               <Heart className="w-4 h-4 text-red-500 fill-current" />
               <span>in Bangladesh</span>
             </div>
-            <div className="flex space-x-6">
-              <Link href="/privacy" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+            <div className="flex space-x-6 mobile-flex-center">
+              <Link href="/privacy" className="text-gray-400 hover:text-blue-400 transition-colors text-sm min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+              <Link href="/terms" className="text-gray-400 hover:text-blue-400 transition-colors text-sm min-h-[44px] flex items-center touch-manipulation active:bg-white/10 rounded-lg px-2 -mx-2">
                 Terms of Service
               </Link>
             </div>

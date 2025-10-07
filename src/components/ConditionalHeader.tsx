@@ -27,15 +27,13 @@ const ConditionalHeader = () => {
     }
   }, [shouldHideHeader, isClient]);
   
-  // Always render Header but conditionally hide it with CSS
-  return (
-    <div 
-      className={shouldHideHeader ? 'hidden' : ''}
-      style={shouldHideHeader ? { display: 'none', visibility: 'hidden', height: 0, overflow: 'hidden' } : {}}
-    >
-      <Header />
-    </div>
-  );
+  // Render appropriate header based on route
+  if (shouldHideHeader) {
+    return null;
+  }
+  
+  
+  return <Header />;
 };
 
 export default ConditionalHeader;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/models/Lead';
-import { trackStudyAbroadLead } from '@/lib/analytics';
+import { trackStudyAbroadLead } from '@/lib/meta-conversion-api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         country: body.country || 'Not specified',
         program: 'Contact Form Inquiry',
         message: message.trim()
-      }, 'contact_form');
+      }, 'contact_form', request);
     } catch (trackingError) {
       console.error('Meta Conversion API tracking error:', trackingError);
       // Don't fail the request if tracking fails

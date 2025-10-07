@@ -37,10 +37,10 @@ const WhatsAppWidget = () => {
 
   return (
     <>
-      {/* Simplified Initial Popup */}
+      {/* Enhanced Mobile Initial Popup */}
       {showInitialPopup && (
-        <div className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-50 max-w-xs">
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 relative overflow-hidden">
+        <div className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-50 max-w-xs mobile-overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 relative overflow-hidden mobile-card">
               {/* Creative Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-50" />
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-200 to-emerald-200 rounded-full -translate-y-8 translate-x-8 opacity-30" />
@@ -58,13 +58,14 @@ const WhatsAppWidget = () => {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={handleWhatsAppClick}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium transition-colors"
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation active:bg-green-700"
                       >
                         Chat Now
                       </button>
                       <button
                         onClick={() => setShowInitialPopup(false)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation active:bg-gray-100 rounded-full"
+                        aria-label="Close popup"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -76,10 +77,10 @@ const WhatsAppWidget = () => {
           </div>
         )}
 
-      {/* Simplified Floating Widget */}
+      {/* Enhanced Mobile Floating Widget */}
       <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-40">
         {isExpanded && (
-          <div className="mb-4 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 max-w-xs relative overflow-hidden">
+          <div className="mb-4 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 max-w-xs relative overflow-hidden mobile-card mobile-overflow-hidden">
               {/* Creative Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-50" />
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full -translate-y-10 translate-x-10 opacity-30" />
@@ -105,14 +106,15 @@ const WhatsAppWidget = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={handleWhatsAppClick}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center"
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center min-h-[44px] touch-manipulation active:bg-green-700"
                   >
                     <MessageSquare className="w-3 h-3 mr-1" />
                     Start Chat
                   </button>
                   <button
                     onClick={() => setIsExpanded(false)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation active:bg-gray-100 rounded-lg"
+                    aria-label="Close chat"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -121,10 +123,12 @@ const WhatsAppWidget = () => {
             </div>
           )}
 
-        {/* Simplified Main Button */}
+        {/* Enhanced Mobile Main Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="relative group hover:scale-105 transition-transform"
+          className="relative group hover:scale-105 transition-transform touch-manipulation active:scale-95"
+          aria-label="Open WhatsApp chat"
+          aria-expanded={isExpanded}
         >
           {/* Glow Effect */}
           <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />

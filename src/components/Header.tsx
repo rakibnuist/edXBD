@@ -15,27 +15,35 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
 
   const countries = countryNames;
 
   const navigation = [
-    { name: 'Home', href: '/', current: pathname === '/' },
-    { name: 'Destinations', href: '/destinations', current: pathname.startsWith('/destinations') },
-    { name: 'Services', href: '/services', current: pathname === '/services' },
-    { name: 'Updates', href: '/updates', current: pathname === '/updates' },
-    { name: 'About', href: '/about', current: pathname === '/about' },
-    { name: 'Contact', href: '/contact', current: pathname === '/contact' },
+    { name: 'Home', href: '/', current: isMounted && pathname === '/' },
+    { name: 'Destinations', href: '/destinations', current: isMounted && pathname.startsWith('/destinations') },
+    { name: 'Services', href: '/services', current: isMounted && pathname === '/services' },
+    { name: 'Updates', href: '/updates', current: isMounted && pathname === '/updates' },
+    { name: 'About', href: '/about', current: isMounted && pathname === '/about' },
+    { name: 'Contact', href: '/contact', current: isMounted && pathname === '/contact' },
   ];
+
+  // Handle mounting to prevent hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
+    if (!isMounted) return;
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isMounted]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -126,6 +134,7 @@ const Header = () => {
                   width={84}
                   height={56}
                   className="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  style={{ width: 'auto', height: '100%' }}
                   priority
                 />
               </div>
@@ -207,41 +216,51 @@ const Header = () => {
             ))}
             
             {/* CTA Button */}
-            <motion.button
-              onClick={() => {
-                trackConsultationRequest('header');
-                window.dispatchEvent(new CustomEvent('openQuickForm'));
-              }}
-              className="btn-primary flex items-center space-x-2 font-primary-semibold hover:scale-105 transition-transform"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span>FREE CONSULTATION</span>
-              <motion.div
-                variants={iconBounce}
-                whileHover="hover"
-                whileTap="tap"
+            {isMounted && (
+              <motion.button
+                onClick={() => {
+                  trackConsultationRequest('header');
+                  window.dispatchEvent(new CustomEvent('openQuickForm'));
+                }}
+                className="btn-primary flex items-center space-x-2 font-primary-semibold hover:scale-105 transition-transform"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <ArrowRight className="w-4 h-4" />
-              </motion.div>
-            </motion.button>
+                <span>FREE CONSULTATION</span>
+                <motion.div
+                  variants={iconBounce}
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              </motion.button>
+            )}
           </motion.div>
 
-          {/* Mobile Menu Button */}
+          {/* Enhanced Mobile Menu Button */}
           <button
-            className="lg:hidden p-3 text-gray-700 hover:text-blue-600 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-gray-100"
+            className="lg:hidden p-3 text-gray-700 hover:text-blue-600 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center rounded-lg hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle mobile menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <motion.div
+              animate={{ rotate: isMenuOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </motion.div>
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Enhanced Mobile Menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
-              className="lg:hidden mt-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl py-4 border border-gray-200 mx-2"
+              id="mobile-menu"
+              className="lg:hidden mt-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl py-4 border border-gray-200 mx-2 mobile-overflow-hidden"
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -253,8 +272,10 @@ const Header = () => {
                     {item.name === 'Destinations' ? (
                       <div>
                         <button 
-                          className="flex items-center justify-between w-full text-lg py-4 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 min-h-[48px] font-montserrat"
+                          className="flex items-center justify-between w-full text-lg py-4 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 min-h-[56px] font-montserrat touch-manipulation active:bg-blue-100"
                           onClick={() => setActiveDropdown(activeDropdown === 'destinations' ? null : 'destinations')}
+                          aria-expanded={activeDropdown === 'destinations'}
+                          aria-controls="destinations-dropdown"
                         >
                           {item.name}
                           <ChevronDown className={`ml-1 w-4 h-4 transform transition-transform ${
@@ -262,23 +283,30 @@ const Header = () => {
                           }`} />
                         </button>
                         {activeDropdown === 'destinations' && (
-                          <div className="pl-4 pb-2 space-y-1">
+                          <motion.div 
+                            id="destinations-dropdown"
+                            className="pl-4 pb-2 space-y-1"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
                             {countries.map((country) => (
                               <Link
                                 key={country}
                                 href={country === 'China' ? '/destinations/china' : country === 'United Kingdom' ? '/destinations/uk' : `/destinations/${country.toLowerCase().replace(' ', '-')}`}
-                                className="text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-open-sans-semibold transition-all duration-200 py-3 px-3 rounded-lg min-h-[44px] flex items-center"
+                                className="text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 font-open-sans-semibold transition-all duration-200 py-3 px-3 rounded-lg min-h-[48px] flex items-center touch-manipulation active:bg-blue-100"
                               >
                                 {country}
                               </Link>
                             ))}
-                          </div>
+                          </motion.div>
                         )}
                       </div>
                     ) : (
                       <Link
                         href={item.href}
-                        className={`text-lg transition-all duration-200 py-4 px-3 rounded-lg min-h-[48px] flex items-center font-montserrat ${
+                        className={`text-lg transition-all duration-200 py-4 px-3 rounded-lg min-h-[56px] flex items-center font-montserrat touch-manipulation active:bg-blue-100 ${
                           item.current 
                             ? 'text-blue-600 font-montserrat-bold bg-blue-50' 
                             : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
@@ -290,25 +318,27 @@ const Header = () => {
                   </div>
                 ))}
                 
-                {/* Partnership Button for Mobile */}
+                {/* Enhanced Partnership Button for Mobile */}
                 <a
                   href="/partnership"
-                  className="w-full mt-4 flex items-center justify-center space-x-2 py-4 min-h-[48px] text-base font-montserrat-bold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 hover:from-yellow-300 hover:via-yellow-200 hover:to-yellow-300 text-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-yellow-200"
+                  className="w-full mt-4 flex items-center justify-center space-x-2 py-4 min-h-[56px] text-base font-montserrat-bold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 hover:from-yellow-300 hover:via-yellow-200 hover:to-yellow-300 text-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-yellow-200 touch-manipulation active:from-yellow-200 active:via-yellow-100 active:to-yellow-200"
                 >
                   <Handshake className="w-5 h-5" />
                   <span>Be our Partner</span>
                 </a>
                 
-                <button
-                  onClick={() => {
-                    trackConsultationRequest('mobile_menu');
-                    window.dispatchEvent(new CustomEvent('openQuickForm'));
-                  }}
-                  className="btn-primary w-full mt-3 flex items-center justify-center space-x-2 py-4 min-h-[48px] text-base font-montserrat-bold"
-                >
-                  <span>FREE CONSULTATION</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {isMounted && (
+                  <button
+                    onClick={() => {
+                      trackConsultationRequest('mobile_menu');
+                      window.dispatchEvent(new CustomEvent('openQuickForm'));
+                    }}
+                    className="btn-primary w-full mt-3 flex items-center justify-center space-x-2 py-4 min-h-[56px] text-base font-montserrat-bold touch-manipulation active:scale-95"
+                  >
+                    <span>FREE CONSULTATION</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </motion.div>
           )}

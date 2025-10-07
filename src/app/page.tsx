@@ -319,7 +319,7 @@ const Home = memo(function Home() {
               <span className="font-bold text-blue-600"> 97% success rate</span> helping 3000+ students study at top universities worldwide.
             </p>
 
-            {/* CTA Buttons */}
+            {/* Enhanced Mobile CTA Buttons */}
             <AnimatedSection animation="fadeInUp" delay={1.2}>
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4">
                 <AnimatedButton
@@ -327,7 +327,7 @@ const Home = memo(function Home() {
                     trackConsultationRequest('hero_cta');
                     window.dispatchEvent(new CustomEvent('openQuickForm'));
                   }}
-                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-full font-semibold shadow-2xl hover:shadow-3xl"
+                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-full font-semibold shadow-2xl hover:shadow-3xl min-h-[56px] touch-manipulation active:scale-95 mobile-flex-center"
                   icon={<ArrowRight className="w-5 h-5" />}
                   iconPosition="right"
                 >
@@ -337,7 +337,7 @@ const Home = memo(function Home() {
                 <AnimatedButton
                   onClick={() => trackApplicationStart('phone_call')}
                   variant="outline"
-                  className="group relative bg-white hover:bg-gray-50 text-blue-600 text-lg px-8 py-4 rounded-full font-semibold shadow-xl border-2 border-blue-600 hover:border-blue-700"
+                  className="group relative bg-white hover:bg-gray-50 text-blue-600 text-lg px-8 py-4 rounded-full font-semibold shadow-xl border-2 border-blue-600 hover:border-blue-700 min-h-[56px] touch-manipulation active:scale-95 mobile-flex-center"
                   icon={<Phone className="w-5 h-5" />}
                   iconPosition="left"
                 >
@@ -346,9 +346,9 @@ const Home = memo(function Home() {
               </div>
             </AnimatedSection>
 
-            {/* Stats Preview */}
+            {/* Enhanced Mobile Stats Preview */}
             <AnimatedSection animation="stagger" delay={1.4}>
-              <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 max-w-4xl mx-auto">
+              <div className="mt-12 sm:mt-16 grid mobile-grid-2 sm:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto mobile-p-4">
                 {[
                   { value: "3000+", label: "Students Helped", icon: "🎓" },
                   { value: "97%", label: "Success Rate", icon: "🏆" },
@@ -357,22 +357,23 @@ const Home = memo(function Home() {
                 ].map((stat, index) => (
                   <motion.div
                     key={stat.label}
-                    className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="text-center mobile-p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mobile-card touch-manipulation"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.6 + index * 0.1 }}
                     whileHover={{ scale: 1.05, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <motion.div 
-                      className="text-3xl mb-2"
+                      className="text-2xl sm:text-3xl mb-2"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 1.8 + index * 0.1, type: "spring", stiffness: 200 }}
                     >
                       {stat.icon}
                     </motion.div>
-                    <div className="text-2xl font-bold text-blue-600 mb-1">{stat.value}</div>
-                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1 mobile-text-large">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-gray-600 font-medium mobile-text-small">{stat.label}</div>
                   </motion.div>
                 ))}
               </div>

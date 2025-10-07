@@ -207,17 +207,18 @@ const QuickContactForm = () => {
           exit="exit"
         >
           <motion.div
-            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mx-2"
+            className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative mx-2 mobile-overflow-hidden mobile-scroll-smooth"
             onClick={(e) => e.stopPropagation()}
             variants={modalContent}
             initial="initial"
             animate="animate"
             exit="exit"
           >
-        {/* Close Button */}
+        {/* Enhanced Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation active:bg-gray-200"
+          aria-label="Close form"
         >
           <X className="w-5 h-5 text-gray-500" />
         </button>
@@ -318,7 +319,9 @@ const QuickContactForm = () => {
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('name')}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] mobile-form-input touch-manipulation"
+                autoComplete="name"
+                autoCapitalize="words"
               />
             </div>
 
@@ -331,7 +334,9 @@ const QuickContactForm = () => {
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('phone')}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] mobile-form-input touch-manipulation"
+                autoComplete="tel"
+                inputMode="tel"
               />
             </div>
 
@@ -344,7 +349,9 @@ const QuickContactForm = () => {
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('email')}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] mobile-form-input touch-manipulation"
+                autoComplete="email"
+                inputMode="email"
               />
             </div>
 
@@ -355,7 +362,7 @@ const QuickContactForm = () => {
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('country')}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] mobile-form-input touch-manipulation"
               >
                 <option value="">Select Study Destination *</option>
                 <option value="united-kingdom">🇬🇧 United Kingdom</option>
@@ -377,7 +384,7 @@ const QuickContactForm = () => {
                 value={formData.program}
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('program')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px]"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] mobile-form-input touch-manipulation"
               >
                 <option value="">Select Program (Optional)</option>
                 <option value="business">Business Administration</option>
@@ -400,14 +407,15 @@ const QuickContactForm = () => {
                 onChange={handleChange}
                 onFocus={() => handleFieldFocus('message')}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[48px] resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base min-h-[56px] resize-none mobile-form-input touch-manipulation"
+                autoComplete="off"
               />
             </div>
 
             <motion.button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl min-h-[48px] text-base hover:scale-105 transform"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl min-h-[56px] text-base hover:scale-105 transform touch-manipulation active:scale-95"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

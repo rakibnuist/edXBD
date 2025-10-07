@@ -8,6 +8,8 @@ import ConditionalHeader from "@/components/ConditionalHeader";
 import ConditionalMain from "@/components/ConditionalMain";
 import PageTransition from "@/components/PageTransition";
 import ScrollToTop from "@/components/ScrollToTop";
+import PerformanceOptimizer from "@/components/PerformanceOptimizer";
+import MobileOptimizer from "@/components/MobileOptimizer";
 import "./globals.css";
 
 // Primary font for body text and UI elements
@@ -51,11 +53,27 @@ export const metadata: Metadata = {
     "overseas education",
     "university admission",
     "student visa",
-    "education consultant"
+    "education consultant",
+    "study abroad consultant",
+    "scholarship consultant",
+    "international student advisor",
+    "study visa consultant",
+    "education abroad",
+    "foreign education",
+    "study overseas",
+    "university application",
+    "student visa application",
+    "education migration",
+    "study permit",
+    "student visa help",
+    "education guidance"
   ],
   authors: [{ name: "EduExpress International", url: "https://www.eduexpressint.com" }],
   creator: "EduExpress International",
   publisher: "EduExpress International",
+  applicationName: "EduExpress International",
+  generator: "Next.js",
+  referrer: "origin-when-cross-origin",
   formatDetection: {
     email: false,
     address: false,
@@ -64,9 +82,11 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
@@ -101,6 +121,9 @@ export const metadata: Metadata = {
     google: "your-google-verification-code",
     yandex: "your-yandex-verification-code",
     yahoo: "your-yahoo-verification-code",
+    other: {
+      "msvalidate.01": "your-bing-verification-code",
+    },
   },
   alternates: {
     canonical: "https://www.eduexpressint.com",
@@ -110,6 +133,17 @@ export const metadata: Metadata = {
     },
   },
   category: 'education',
+  classification: 'Education Services',
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'EduExpress International',
+    'application-name': 'EduExpress International',
+    'msapplication-TileColor': '#1e40af',
+    'msapplication-config': '/browserconfig.xml',
+    'theme-color': '#1e40af',
+  },
 };
 
 export default function RootLayout({
@@ -121,8 +155,8 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     "name": "EduExpress International",
-    "alternateName": "EduExpress",
-    "description": "Leading study abroad consultancy in Bangladesh providing expert guidance and FREE scholarship assistance for international education. 97% success rate with 10,000+ students helped.",
+    "alternateName": ["EduExpress", "EduExpress International Consultancy"],
+    "description": "Leading study abroad consultancy in Bangladesh providing expert guidance and FREE scholarship assistance for international education. 97% success rate with 3000+ students helped since 2018.",
     "url": "https://www.eduexpressint.com",
     "logo": {
       "@type": "ImageObject",
@@ -130,8 +164,11 @@ export default function RootLayout({
       "width": 200,
       "height": 200
     },
-    "image": "https://www.eduexpressint.com/og-image.jpg",
-    "foundingDate": "2005",
+    "image": [
+      "https://www.eduexpressint.com/og-image.jpg",
+      "https://www.eduexpressint.com/logo.png"
+    ],
+    "foundingDate": "2018",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "House: 12/1, Ground Floor, Road: 4/A",
@@ -183,7 +220,9 @@ export default function RootLayout({
             "@type": "Service",
             "name": "Study Abroad Consultation",
             "description": "Free consultation for study abroad opportunities"
-          }
+          },
+          "price": "0",
+          "priceCurrency": "BDT"
         },
         {
           "@type": "Offer",
@@ -191,7 +230,9 @@ export default function RootLayout({
             "@type": "Service",
             "name": "Scholarship Assistance",
             "description": "Free scholarship application assistance"
-          }
+          },
+          "price": "0",
+          "priceCurrency": "BDT"
         },
         {
           "@type": "Offer",
@@ -200,17 +241,43 @@ export default function RootLayout({
             "name": "Visa Application Support",
             "description": "Complete visa application guidance"
           }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "University Application Support",
+            "description": "Complete university application assistance"
+          }
         }
       ]
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": "1250",
+      "reviewCount": "3000",
       "bestRating": "5",
       "worstRating": "1"
     },
-    "priceRange": "Free consultation available"
+    "priceRange": "Free consultation available",
+    "knowsAbout": [
+      "Study Abroad",
+      "Scholarship Applications",
+      "Visa Processing",
+      "University Applications",
+      "International Education",
+      "Student Visa",
+      "Education Consultancy"
+    ],
+    "makesOffer": [
+      {
+        "@type": "Offer",
+        "name": "Free Study Abroad Consultation",
+        "description": "Complimentary consultation for study abroad opportunities",
+        "price": "0",
+        "priceCurrency": "BDT"
+      }
+    ]
   };
 
   return (
@@ -221,10 +288,15 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <link rel="canonical" href="https://www.eduexpressint.com" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
         <meta name="theme-color" content="#1e40af" />
         <meta name="msapplication-TileColor" content="#1e40af" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="EduExpress International" />
+        <meta name="format-detection" content="telephone=no" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -265,6 +337,8 @@ export default function RootLayout({
         className={`${inter.variable} ${playfairDisplay.variable} antialiased`}
         style={{ marginTop: 0 }}
       >
+        <PerformanceOptimizer />
+        <MobileOptimizer />
         <Analytics />
         <ConditionalHeader />
         <ConditionalMain>

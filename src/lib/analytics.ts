@@ -174,7 +174,7 @@ export const trackCountryInterest = (country: string) => {
   });
 };
 
-// Meta Conversion API Functions
+// Meta Conversion API Functions (Client-side wrapper)
 export const sendConversionAPIEvent = async (
   eventName: string,
   userData: {
@@ -186,39 +186,20 @@ export const sendConversionAPIEvent = async (
   customData?: Record<string, unknown>,
   eventId?: string
 ) => {
-  if (!META_ACCESS_TOKEN || !META_PIXEL_ID) {
-    return;
-  }
-
   try {
-    const eventData = {
-      data: [
-        {
-          event_name: eventName,
-          event_time: Math.floor(Date.now() / 1000),
-          event_id: eventId || generateEventId(),
-          user_data: {
-            em: userData.email ? [await hashData(userData.email)] : undefined,
-            ph: userData.phone ? [await hashData(userData.phone)] : undefined,
-            fn: userData.firstName ? [await hashData(userData.firstName)] : undefined,
-            ln: userData.lastName ? [await hashData(userData.lastName)] : undefined,
-            client_ip_address: await getClientIP(),
-            client_user_agent: typeof window !== 'undefined' ? navigator.userAgent : '',
-          },
-          custom_data: customData,
-          event_source_url: typeof window !== 'undefined' ? window.location.href : '',
-          action_source: 'website',
-        },
-      ],
-      access_token: META_ACCESS_TOKEN,
-    };
-
-    const response = await fetch('https://graph.facebook.com/v18.0/events', {
+    const response = await fetch('/api/meta-conversion', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(eventData),
+      body: JSON.stringify({
+        eventType: eventName.toLowerCase().replace(/([A-Z])/g, '_$1'),
+        data: {
+          userData,
+          ...customData
+        },
+        source: 'client_side'
+      }),
     });
 
     if (!response.ok) {

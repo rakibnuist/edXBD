@@ -1,14 +1,36 @@
 {
-  "name": "edxbd",
-  "version": "0.1.0",
+  "name": "eduexpress-international",
+  "version": "1.0.0",
+  "description": "EduExpress International - Your Gateway to Global Education. Expert study abroad consultancy with FREE scholarship assistance since 2018.",
   "private": true,
+  "homepage": "https://eduexpressint.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/edXBD.git"
+  },
+  "keywords": [
+    "study-abroad",
+    "education-consultancy",
+    "scholarship-assistance",
+    "international-education",
+    "nextjs",
+    "typescript",
+    "mongodb",
+    "tailwindcss"
+  ],
+  "author": "EduExpress International",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "seed:admin": "node scripts/seed-admin.js"
+    "type-check": "tsc --noEmit",
+    "seed:admin": "node scripts/seed-admin.js",
+    "analyze": "ANALYZE=true npm run build",
+    "clean": "rm -rf .next out dist",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -24,7 +46,8 @@
     "mongoose": "^8.19.0",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "web-vitals": "^3.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
