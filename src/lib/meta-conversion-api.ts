@@ -35,6 +35,11 @@ export const generateEventId = (): string => {
   return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 
+// Generate PageView event ID that can be shared between client and server
+export const generatePageViewEventId = (): string => {
+  return `pageview_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
 // Send event to Meta Conversion API
 export const sendConversionAPIEvent = async (
   eventName: string,
@@ -214,9 +219,10 @@ export const trackConsultationRequest = async (
 export const trackPageView = async (
   pageName: string,
   pageCategory?: string,
-  request?: Request
+  request?: Request,
+  eventId?: string
 ): Promise<{ success: boolean; eventId: string; error?: string }> => {
-  const eventId = generateEventId();
+  const finalEventId = eventId || generatePageViewEventId();
   
   const customData = {
     content_name: pageName,
@@ -225,7 +231,7 @@ export const trackPageView = async (
     page_category: pageCategory || 'general',
   };
 
-  return await sendConversionAPIEvent('PageView', {}, customData, eventId, request);
+  return await sendConversionAPIEvent('PageView', {}, customData, finalEventId, request);
 };
 
 export const trackViewContent = async (

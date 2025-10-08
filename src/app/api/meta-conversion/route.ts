@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         break;
       
       case 'page_view':
-        result = await trackPageView(data.pageName, data.pageCategory, request);
+        result = await trackPageView(data.pageName, data.pageCategory, request, data.eventId);
         break;
       
       case 'view_content':

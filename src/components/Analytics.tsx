@@ -44,7 +44,28 @@ const Analytics = () => {
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '1292963899542368');
-            fbq('track', 'PageView');
+            
+            // Generate unique event ID for PageView deduplication
+            const pageViewEventId = 'pageview_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            fbq('track', 'PageView', {}, { eventID: pageViewEventId });
+            
+            // Store event ID for server-side deduplication
+            window.pageViewEventId = pageViewEventId;
+            
+            // Send PageView to server with same event ID for deduplication
+            fetch('/api/meta-conversion', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                eventType: 'page_view',
+                data: {
+                  pageName: document.title,
+                  pageCategory: 'general',
+                  eventId: pageViewEventId
+                },
+                source: 'client_side'
+              })
+            }).catch(err => console.log('PageView server tracking failed:', err));
           `,
         }}
       />
