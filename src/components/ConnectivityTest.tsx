@@ -38,7 +38,7 @@ export default function ConnectivityTest() {
       const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
       if (!pixelId || pixelId === '1234567890') {
         errors.push('Meta Pixel ID not configured');
-      } else if (typeof window !== 'undefined' && window.fbq) {
+      } else if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
         setStatus(prev => ({ ...prev, metaPixel: true }));
       } else {
         errors.push('Meta Pixel not loaded');
@@ -75,7 +75,7 @@ export default function ConnectivityTest() {
       const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
       if (!gtmId || gtmId === 'GTM-XXXXXXX') {
         errors.push('GTM ID not configured');
-      } else if (typeof window !== 'undefined' && window.gtag) {
+      } else if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
         setStatus(prev => ({ ...prev, gtm: true }));
       } else {
         errors.push('GTM not loaded');
@@ -89,7 +89,7 @@ export default function ConnectivityTest() {
       const ga4Id = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
       if (!ga4Id || ga4Id === 'G-XXXXXXXXXX') {
         errors.push('GA4 ID not configured');
-      } else if (typeof window !== 'undefined' && window.gtag) {
+      } else if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
         setStatus(prev => ({ ...prev, ga4: true }));
       } else {
         errors.push('GA4 not loaded');
