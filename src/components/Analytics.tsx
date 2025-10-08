@@ -35,6 +35,7 @@ const Analytics = () => {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
+            console.log('Meta Pixel script starting...');
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -43,11 +44,15 @@ const Analytics = () => {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+            console.log('Meta Pixel script loaded, initializing...');
             fbq('init', '1292963899542368');
+            console.log('Meta Pixel initialized');
             
             // Generate unique event ID for PageView deduplication
             const pageViewEventId = 'pageview_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            console.log('PageView Event ID:', pageViewEventId);
             fbq('track', 'PageView', {}, { eventID: pageViewEventId });
+            console.log('PageView tracked');
             
             // Store event ID for server-side deduplication
             window.pageViewEventId = pageViewEventId;
@@ -65,7 +70,11 @@ const Analytics = () => {
                 },
                 source: 'client_side'
               })
-            }).catch(err => console.log('PageView server tracking failed:', err));
+            }).then(response => {
+              console.log('Server PageView response:', response.status);
+            }).catch(err => {
+              console.log('PageView server tracking failed:', err);
+            });
           `,
         }}
       />
