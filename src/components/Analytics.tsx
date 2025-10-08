@@ -43,7 +43,7 @@ const Analytics = () => {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${META_PIXEL_ID}');
+            fbq('init', '1292963899542368');
             fbq('track', 'PageView');
           `,
         }}
