@@ -813,3 +813,196 @@ export const testConversionAPI = async (
 
   return await sendConversionAPIEvent('PageView', {}, customData, eventId, request);
 };
+
+// New Meta Events from the implementation guide
+
+// Add to Cart - for application forms
+export const trackAddToCart = async (
+  value: number,
+  currency: string,
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    value,
+    currency,
+    content_name: contentName,
+    content_category: contentCategory,
+    content_ids: [contentName],
+    contents: [{
+      id: contentName,
+      quantity: 1,
+      item_price: value
+    }]
+  };
+
+  return await sendConversionAPIEvent('AddToCart', userData, customData, eventId, request);
+};
+
+// Add to Wishlist - for saved programs
+export const trackAddToWishlist = async (
+  value: number,
+  currency: string,
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    value,
+    currency,
+    content_name: contentName,
+    content_category: contentCategory,
+    content_ids: [contentName],
+    contents: [{
+      id: contentName,
+      quantity: 1,
+      item_price: value
+    }]
+  };
+
+  return await sendConversionAPIEvent('AddToWishlist', userData, customData, eventId, request);
+};
+
+// Initiate Checkout - for application process
+export const trackInitiateCheckout = async (
+  value: number,
+  currency: string,
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    value,
+    currency,
+    content_name: contentName,
+    content_category: contentCategory,
+    content_ids: [contentName],
+    contents: [{
+      id: contentName,
+      quantity: 1,
+      item_price: value
+    }],
+    num_items: 1
+  };
+
+  return await sendConversionAPIEvent('InitiateCheckout', userData, customData, eventId, request);
+};
+
+// Purchase - for paid services/applications
+export const trackPurchase = async (
+  value: number,
+  currency: string,
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    value,
+    currency,
+    content_name: contentName,
+    content_category: contentCategory,
+    content_ids: [contentName],
+    contents: [{
+      id: contentName,
+      quantity: 1,
+      item_price: value
+    }],
+    num_items: 1
+  };
+
+  return await sendConversionAPIEvent('Purchase', userData, customData, eventId, request);
+};
+
+// Search - for program searches
+export const trackSearch = async (
+  searchString: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    search_string: searchString
+  };
+
+  return await sendConversionAPIEvent('Search', userData, customData, eventId, request);
+};
+
+// Find Location - for office visits
+export const trackFindLocation = async (
+  searchString: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    search_string: searchString
+  };
+
+  return await sendConversionAPIEvent('FindLocation', userData, customData, eventId, request);
+};
+
+// Schedule - for consultation bookings
+export const trackSchedule = async (
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: contentName,
+    content_category: contentCategory
+  };
+
+  return await sendConversionAPIEvent('Schedule', userData, customData, eventId, request);
+};
+
+// Submit Application - perfect for education!
+export const trackSubmitApplication = async (
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: contentName,
+    content_category: contentCategory
+  };
+
+  return await sendConversionAPIEvent('SubmitApplication', userData, customData, eventId, request);
+};
+
+// Subscribe - for newsletter signups
+export const trackSubscribe = async (
+  contentName: string,
+  contentCategory: string,
+  userData: any,
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: contentName,
+    content_category: contentCategory
+  };
+
+  return await sendConversionAPIEvent('Subscribe', userData, customData, eventId, request);
+};

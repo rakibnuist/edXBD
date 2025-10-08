@@ -21,6 +21,15 @@ import {
   trackDocumentDownload,
   trackEmailSubscription,
   trackPartnershipInquiry,
+  trackAddToCart,
+  trackAddToWishlist,
+  trackInitiateCheckout,
+  trackPurchase,
+  trackSearch,
+  trackFindLocation,
+  trackSchedule,
+  trackSubmitApplication,
+  trackSubscribe,
   testConversionAPI
 } from '@/lib/meta-conversion-api';
 
@@ -116,6 +125,43 @@ export async function POST(request: NextRequest) {
         result = await trackPartnershipInquiry(data.userData, request);
         break;
       
+      // New Meta Events from the guide
+      case 'add_to_cart':
+        result = await trackAddToCart(data.value, data.currency, data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'add_to_wishlist':
+        result = await trackAddToWishlist(data.value, data.currency, data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'initiate_checkout':
+        result = await trackInitiateCheckout(data.value, data.currency, data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'purchase':
+        result = await trackPurchase(data.value, data.currency, data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'search':
+        result = await trackSearch(data.searchString, data.userData, request);
+        break;
+      
+      case 'find_location':
+        result = await trackFindLocation(data.searchString, data.userData, request);
+        break;
+      
+      case 'schedule':
+        result = await trackSchedule(data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'submit_application':
+        result = await trackSubmitApplication(data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
+      case 'subscribe':
+        result = await trackSubscribe(data.contentName, data.contentCategory, data.userData, request);
+        break;
+      
       case 'test':
         result = await testConversionAPI(request);
         break;
@@ -162,6 +208,15 @@ export async function GET() {
       'document_download',
       'email_subscription',
       'partnership_inquiry',
+      'add_to_cart',
+      'add_to_wishlist',
+      'initiate_checkout',
+      'purchase',
+      'search',
+      'find_location',
+      'schedule',
+      'submit_application',
+      'subscribe',
       'test'
     ]
   });
