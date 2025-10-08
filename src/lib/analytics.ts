@@ -1,13 +1,5 @@
 // Analytics and tracking utilities for EduExpress International
 
-declare global {
-  interface Window {
-    gtag: (...args: unknown[]) => void;
-    fbq: (action: string, event?: string, parameters?: Record<string, unknown>) => void;
-    dataLayer: unknown[];
-  }
-}
-
 // Configuration
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 export const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
@@ -19,7 +11,7 @@ export const initGTM = () => {
   if (typeof window !== 'undefined' && GTM_ID !== 'GTM-XXXXXXX') {
     window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag(...args: unknown[]) {
-      window.dataLayer.push(args);
+      window.dataLayer?.push(args);
     };
     window.gtag('js', new Date());
     window.gtag('config', GTM_ID);
@@ -31,7 +23,7 @@ export const initGA4 = () => {
   if (typeof window !== 'undefined' && GA4_MEASUREMENT_ID !== 'G-XXXXXXXXXX') {
     window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag(...args: unknown[]) {
-      window.dataLayer.push(args);
+      window.dataLayer?.push(args);
     };
     window.gtag('js', new Date());
     window.gtag('config', GA4_MEASUREMENT_ID);

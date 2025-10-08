@@ -2,8 +2,9 @@
 declare global {
   interface Window {
     pageViewEventId?: string;
-    fbq?: (...args: any[]) => void;
-    gtag?: (...args: any[]) => void;
+    fbq?: (action: string, event?: string, parameters?: Record<string, unknown>) => void;
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
