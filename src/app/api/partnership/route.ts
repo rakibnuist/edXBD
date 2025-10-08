@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Partnership from '@/models/Partnership';
+import { trackPartnershipInquiry } from '@/lib/meta-conversion-api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -137,6 +138,20 @@ export async function POST(request: NextRequest) {
     });
 
     await partnership.save();
+
+    // Track partnership inquiry with Meta Conversion API
+    try {
+      await trackPartnershipInquiry({
+        name: contactPerson,
+        email: email,
+        phone: phone,
+        company: companyName,
+        message: motivation
+      }, request);
+    } catch (trackingError) {
+      console.error('Meta Conversion API tracking error:', trackingError);
+      // Don't fail the request if tracking fails
+    }
 
     // Send confirmation email (you can implement this later)
     // await sendPartnershipConfirmationEmail(partnership);

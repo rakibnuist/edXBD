@@ -12,6 +12,15 @@ import {
   trackAdmissionReceived,
   trackVisaApproval,
   trackEnrollmentCompletion,
+  trackWhatsAppClick,
+  trackPhoneClick,
+  trackDestinationView,
+  trackScholarshipInquiry,
+  trackUniversityInterest,
+  trackProgramInterest,
+  trackDocumentDownload,
+  trackEmailSubscription,
+  trackPartnershipInquiry,
   testConversionAPI
 } from '@/lib/meta-conversion-api';
 
@@ -71,6 +80,42 @@ export async function POST(request: NextRequest) {
         result = await trackEnrollmentCompletion(data.leadData, request);
         break;
       
+      case 'whatsapp_click':
+        result = await trackWhatsAppClick(source, data.userData, request);
+        break;
+      
+      case 'phone_click':
+        result = await trackPhoneClick(source, data.userData, request);
+        break;
+      
+      case 'destination_view':
+        result = await trackDestinationView(data.countryName, data.userData, request);
+        break;
+      
+      case 'scholarship_inquiry':
+        result = await trackScholarshipInquiry(data.userData, request);
+        break;
+      
+      case 'university_interest':
+        result = await trackUniversityInterest(data.universityName, data.country, data.userData, request);
+        break;
+      
+      case 'program_interest':
+        result = await trackProgramInterest(data.programName, data.country, data.userData, request);
+        break;
+      
+      case 'document_download':
+        result = await trackDocumentDownload(data.documentName, data.documentType, data.userData, request);
+        break;
+      
+      case 'email_subscription':
+        result = await trackEmailSubscription(data.userData, request);
+        break;
+      
+      case 'partnership_inquiry':
+        result = await trackPartnershipInquiry(data.userData, request);
+        break;
+      
       case 'test':
         result = await testConversionAPI(request);
         break;
@@ -102,6 +147,21 @@ export async function GET() {
       'view_content',
       'complete_registration',
       'contact',
+      'lead_status_change',
+      'consultation_booking',
+      'application_submission',
+      'admission_received',
+      'visa_approval',
+      'enrollment_completion',
+      'whatsapp_click',
+      'phone_click',
+      'destination_view',
+      'scholarship_inquiry',
+      'university_interest',
+      'program_interest',
+      'document_download',
+      'email_subscription',
+      'partnership_inquiry',
       'test'
     ]
   });

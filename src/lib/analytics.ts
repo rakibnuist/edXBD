@@ -129,14 +129,6 @@ export const trackFormSubmission = (formType: string, formData?: Record<string, 
   });
 };
 
-export const trackPhoneClick = (phoneNumber: string) => {
-  trackEvent('Contact', {
-    event_category: 'contact',
-    event_label: 'phone_click',
-    content_name: 'Phone Contact',
-    phone_number: phoneNumber
-  });
-};
 
 export const trackEmailClick = (email: string) => {
   trackEvent('Contact', {
@@ -147,14 +139,6 @@ export const trackEmailClick = (email: string) => {
   });
 };
 
-export const trackWhatsAppClick = (source: string) => {
-  trackEvent('Contact', {
-    event_category: 'whatsapp',
-    event_label: 'whatsapp_click',
-    content_name: 'WhatsApp Contact',
-    source: source
-  });
-};
 
 export const trackPageView = (pageName: string, pageCategory?: string) => {
   trackEvent('page_view', {
@@ -307,6 +291,89 @@ export const trackDashboardView = (dashboardType: string) => {
     event_category: 'admin',
     event_label: 'dashboard_view',
     dashboard_type: dashboardType
+  });
+};
+
+// Enhanced tracking functions for education consultancy
+export const trackWhatsAppClick = (source: string = 'website') => {
+  trackEvent('contact', {
+    event_category: 'communication',
+    event_label: 'whatsapp_click',
+    contact_method: 'whatsapp',
+    source: source
+  });
+};
+
+export const trackPhoneClick = (source: string = 'website') => {
+  trackEvent('contact', {
+    event_category: 'communication',
+    event_label: 'phone_click',
+    contact_method: 'phone',
+    source: source
+  });
+};
+
+export const trackDestinationView = (countryName: string) => {
+  trackEvent('view_content', {
+    event_category: 'destination_interest',
+    event_label: `study_in_${countryName.toLowerCase().replace(/\s+/g, '_')}`,
+    destination_country: countryName,
+    content_name: `Study in ${countryName}`
+  });
+};
+
+export const trackScholarshipInquiry = (country?: string, program?: string) => {
+  trackEvent('lead', {
+    event_category: 'scholarship_interest',
+    event_label: 'scholarship_inquiry',
+    study_destination: country || 'not_specified',
+    program_interest: program || 'not_specified'
+  });
+};
+
+export const trackUniversityInterest = (universityName: string, country: string) => {
+  trackEvent('view_content', {
+    event_category: 'university_research',
+    event_label: `university_${universityName.toLowerCase().replace(/\s+/g, '_')}`,
+    university_name: universityName,
+    destination_country: country,
+    content_name: `University Interest: ${universityName}`
+  });
+};
+
+export const trackProgramInterest = (programName: string, country: string) => {
+  trackEvent('view_content', {
+    event_category: 'program_research',
+    event_label: `program_${programName.toLowerCase().replace(/\s+/g, '_')}`,
+    program_name: programName,
+    destination_country: country,
+    content_name: `Program Interest: ${programName}`
+  });
+};
+
+export const trackDocumentDownload = (documentName: string, documentType: string) => {
+  trackEvent('view_content', {
+    event_category: 'document_download',
+    event_label: `download_${documentName.toLowerCase().replace(/\s+/g, '_')}`,
+    document_type: documentType,
+    content_name: `Download: ${documentName}`
+  });
+};
+
+export const trackEmailSubscription = (email: string) => {
+  trackEvent('subscribe', {
+    event_category: 'newsletter_signup',
+    event_label: 'email_subscription',
+    content_name: 'Email Subscription'
+  });
+};
+
+export const trackPartnershipInquiry = (companyName?: string) => {
+  trackEvent('lead', {
+    event_category: 'business_partnership',
+    event_label: 'partnership_inquiry',
+    company_name: companyName || 'not_specified',
+    content_name: 'Partnership Inquiry'
   });
 };
 

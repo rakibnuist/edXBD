@@ -11,6 +11,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import PerformanceOptimizer from "@/components/PerformanceOptimizer";
 import MobileOptimizer from "@/components/MobileOptimizer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import EducationTracking from "@/components/EducationTracking";
 import "./globals.css";
 
 // Primary font for body text and UI elements
@@ -341,6 +342,10 @@ export default function RootLayout({
         <PerformanceOptimizer />
         <MobileOptimizer />
         <Analytics />
+        <EducationTracking 
+          whatsappSource="floating_widget"
+          phoneSource="header_contact"
+        />
         <ConditionalHeader />
         <ConditionalMain>
           <PageTransition>

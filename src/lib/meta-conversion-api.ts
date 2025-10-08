@@ -114,7 +114,7 @@ export const sendConversionAPIEvent = async (
       access_token: META_ACCESS_TOKEN,
     };
 
-    const response = await fetch(`https://graph.facebook.com/${META_API_VERSION}/events`, {
+    const response = await fetch(`https://graph.facebook.com/${META_API_VERSION}/${META_PIXEL_ID}/events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -556,6 +556,245 @@ export const trackEnrollmentCompletion = async (
   };
 
   return await sendConversionAPIEvent('Purchase', userData, customData, eventId, request);
+};
+
+// Track WhatsApp interactions
+export const trackWhatsAppClick = async (
+  source: string = 'website',
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: 'WhatsApp Contact',
+    content_category: 'Communication',
+    contact_method: 'whatsapp',
+    source: source,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Contact', userData || {}, customData, eventId, request);
+};
+
+// Track phone call interactions
+export const trackPhoneClick = async (
+  source: string = 'website',
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: 'Phone Call',
+    content_category: 'Communication',
+    contact_method: 'phone',
+    source: source,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Contact', userData || {}, customData, eventId, request);
+};
+
+// Track destination page views with country interest
+export const trackDestinationView = async (
+  countryName: string,
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: `Study in ${countryName}`,
+    content_category: 'Destination Interest',
+    destination_country: countryName,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('ViewContent', userData || {}, customData, eventId, request);
+};
+
+// Track scholarship inquiry
+export const trackScholarshipInquiry = async (
+  userData: {
+    email: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+    country?: string;
+    program?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: 'Scholarship Inquiry',
+    content_category: 'Scholarship Interest',
+    study_destination: userData.country || 'not_specified',
+    program_interest: userData.program || 'not_specified',
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Lead', userData, customData, eventId, request);
+};
+
+// Track university interest
+export const trackUniversityInterest = async (
+  universityName: string,
+  country: string,
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: `University Interest: ${universityName}`,
+    content_category: 'University Research',
+    university_name: universityName,
+    destination_country: country,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('ViewContent', userData || {}, customData, eventId, request);
+};
+
+// Track program interest
+export const trackProgramInterest = async (
+  programName: string,
+  country: string,
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: `Program Interest: ${programName}`,
+    content_category: 'Program Research',
+    program_name: programName,
+    destination_country: country,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('ViewContent', userData || {}, customData, eventId, request);
+};
+
+// Track document download
+export const trackDocumentDownload = async (
+  documentName: string,
+  documentType: string,
+  userData?: {
+    email?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: `Download: ${documentName}`,
+    content_category: 'Document Download',
+    document_type: documentType,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('ViewContent', userData || {}, customData, eventId, request);
+};
+
+// Track email subscription
+export const trackEmailSubscription = async (
+  userData: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  
+  const customData = {
+    content_name: 'Email Subscription',
+    content_category: 'Newsletter Signup',
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Subscribe', userData, customData, eventId, request);
+};
+
+// Track partnership inquiry
+export const trackPartnershipInquiry = async (
+  userData: {
+    name: string;
+    email: string;
+    phone?: string;
+    company?: string;
+    message?: string;
+  },
+  request?: Request
+): Promise<{ success: boolean; eventId: string; error?: string }> => {
+  const eventId = generateEventId();
+  const [firstName, ...lastNameParts] = userData.name.split(' ');
+  const lastName = lastNameParts.join(' ') || '';
+  
+  const customData = {
+    content_name: 'Partnership Inquiry',
+    content_category: 'Business Partnership',
+    company_name: userData.company || 'not_specified',
+    has_message: !!userData.message,
+    value: 0,
+    currency: 'BDT',
+    education_consultancy_event: true,
+  };
+
+  return await sendConversionAPIEvent('Lead', {
+    email: userData.email,
+    phone: userData.phone,
+    firstName: firstName,
+    lastName: lastName,
+  }, customData, eventId, request);
 };
 
 // Test event for debugging
