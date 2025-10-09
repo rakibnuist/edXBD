@@ -30,6 +30,27 @@ export const getClientIP = (request: Request): string => {
   return '127.0.0.1';
 };
 
+// Extract Event Quality parameters from request
+export const extractEventQualityParams = (request: Request): {
+  fbc?: string;
+  fbp?: string;
+  external_id?: string;
+  fb_login_id?: string;
+} => {
+  const url = new URL(request.url);
+  const fbc = url.searchParams.get('fbclid') || undefined;
+  
+  // Note: fbp, external_id, and fb_login_id should be passed from client-side
+  // as they're not available in server-side requests
+  return {
+    fbc,
+    // These will be passed from the client-side tracking
+    fbp: undefined,
+    external_id: undefined,
+    fb_login_id: undefined
+  };
+};
+
 // Generate unique event ID for deduplication
 export const generateEventId = (): string => {
   return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -40,7 +61,7 @@ export const generatePageViewEventId = (): string => {
   return `pageview_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 
-// Send event to Meta Conversion API
+// Send event to Meta Conversion API with Event Quality parameters
 export const sendConversionAPIEvent = async (
   eventName: string,
   userData: {
@@ -52,6 +73,11 @@ export const sendConversionAPIEvent = async (
     state?: string;
     country?: string;
     zipCode?: string;
+    // Event Quality parameters
+    fbc?: string;
+    fbp?: string;
+    external_id?: string;
+    fb_login_id?: string;
   },
   customData?: Record<string, unknown>,
   eventId?: string,
@@ -69,7 +95,7 @@ export const sendConversionAPIEvent = async (
     const finalEventId = eventId || generateEventId();
     
     // Prepare user data with hashed values
-    const hashedUserData: Record<string, string[]> = {};
+    const hashedUserData: Record<string, string[] | string> = {};
     
     if (userData.email) {
       hashedUserData.em = [hashData(userData.email)];
@@ -94,6 +120,20 @@ export const sendConversionAPIEvent = async (
     }
     if (userData.zipCode) {
       hashedUserData.zp = [hashData(userData.zipCode)];
+    }
+
+    // Add Event Quality parameters (these should NOT be hashed)
+    if (userData.fbc) {
+      hashedUserData.fbc = userData.fbc;
+    }
+    if (userData.fbp) {
+      hashedUserData.fbp = userData.fbp;
+    }
+    if (userData.external_id) {
+      hashedUserData.external_id = userData.external_id;
+    }
+    if (userData.fb_login_id) {
+      hashedUserData.fb_login_id = userData.fb_login_id;
     }
 
     // Get client IP and user agent

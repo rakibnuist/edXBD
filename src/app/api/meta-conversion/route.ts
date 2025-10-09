@@ -30,13 +30,30 @@ import {
   trackSchedule,
   trackSubmitApplication,
   trackSubscribe,
-  testConversionAPI
+  testConversionAPI,
+  extractEventQualityParams
 } from '@/lib/meta-conversion-api';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { eventType, data, source } = body;
+
+    // Extract Event Quality parameters from the request
+    const eventQualityParams = extractEventQualityParams(request);
+    
+    // Merge Event Quality parameters with user data if available
+    if (data.userData) {
+      data.userData = {
+        ...data.userData,
+        ...eventQualityParams,
+        // Override with client-provided parameters if available
+        fbc: data.fbc || eventQualityParams.fbc,
+        fbp: data.fbp || eventQualityParams.fbp,
+        external_id: data.external_id || eventQualityParams.external_id,
+        fb_login_id: data.fb_login_id || eventQualityParams.fb_login_id
+      };
+    }
 
     let result;
 
