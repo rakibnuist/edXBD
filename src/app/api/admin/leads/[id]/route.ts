@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyTokenFromRequest } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/models/Lead';
 
@@ -7,6 +8,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -20,7 +27,7 @@ export async function GET(
 
     return NextResponse.json(lead);
   } catch (error) {
-    // Error fetching lead
+    console.error('Fetch lead error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch lead' },
       { status: 500 }
@@ -33,6 +40,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -52,7 +65,7 @@ export async function PUT(
 
     return NextResponse.json(lead);
   } catch (error) {
-    // Error updating lead
+    console.error('Update lead error:', error);
     return NextResponse.json(
       { error: 'Failed to update lead' },
       { status: 500 }
@@ -65,6 +78,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -84,7 +103,7 @@ export async function PATCH(
 
     return NextResponse.json(lead);
   } catch (error) {
-    // Error updating lead
+    console.error('Update lead error:', error);
     return NextResponse.json(
       { error: 'Failed to update lead' },
       { status: 500 }
@@ -97,6 +116,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -110,7 +135,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Lead deleted successfully' });
   } catch (error) {
-    // Error deleting lead
+    console.error('Delete lead error:', error);
     return NextResponse.json(
       { error: 'Failed to delete lead' },
       { status: 500 }

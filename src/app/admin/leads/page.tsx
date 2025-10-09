@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackDashboardView, trackLeadManagement, sendConversionAPIEvent } from '@/lib/analytics';
 import { trackLeadStatusChange } from '@/lib/meta-conversion-api';
 import { Lead } from '@/lib/types';
 import WhatsAppButton from '@/components/WhatsAppButton';
 
 export default function LeadsPage() {
+  const { getAuthHeaders } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -41,7 +43,9 @@ export default function LeadsPage() {
       }
       
       const url = `/api/admin/leads${params.toString() ? `?${params.toString()}` : ''}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: getAuthHeaders()
+      });
       if (response.ok) {
         const data = await response.json();
         setLeads(data);
@@ -65,9 +69,7 @@ export default function LeadsPage() {
     try {
       const response = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -172,6 +174,7 @@ export default function LeadsPage() {
       try {
         const response = await fetch(`/api/admin/leads/${leadId}`, {
           method: 'DELETE',
+          headers: getAuthHeaders(),
         });
 
         if (response.ok) {

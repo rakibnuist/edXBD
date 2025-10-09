@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyTokenFromRequest } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/models/Lead';
 
 export async function GET(request: NextRequest) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(request.url);
@@ -38,6 +45,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
 
     const body = await request.json();
@@ -46,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(lead, { status: 201 });
   } catch (error) {
-    // Error creating lead
+    console.error('Error creating lead:', error);
     return NextResponse.json(
       { error: 'Failed to create lead' },
       { status: 500 }
