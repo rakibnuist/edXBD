@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { initGTM, initGA4, initMetaPixel, GTM_ID, GA4_MEASUREMENT_ID, META_PIXEL_ID } from '@/lib/analytics';
 
 const Analytics = () => {
@@ -14,6 +15,9 @@ const Analytics = () => {
 
   return (
     <>
+      {/* Vercel Analytics */}
+      <VercelAnalytics />
+      
       {/* Google Tag Manager */}
       <Script
         id="gtm-script"

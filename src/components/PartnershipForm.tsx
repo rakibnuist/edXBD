@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   Handshake
 } from 'lucide-react';
+import { trackFormSubmission, getUserDevice } from '@/lib/vercel-analytics';
 
 interface PartnershipFormData {
   // Essential Information Only
@@ -217,6 +218,16 @@ const PartnershipForm = () => {
       });
 
       if (response.ok) {
+        // Track successful partnership form submission
+        trackFormSubmission('partnership', {
+          page: 'partnership_form',
+          source: 'partnership_page',
+          user_type: 'new',
+          device: getUserDevice(),
+          partnership_type: formData.partnershipType,
+          country: formData.country
+        });
+        
         setSubmitStatus('success');
         setFormData(initialFormData);
         setCurrentStep(1);

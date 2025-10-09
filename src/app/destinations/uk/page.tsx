@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import ConsultationButton from '@/components/ConsultationButton';
+import { trackDestinationInterest, getUserDevice } from '@/lib/vercel-analytics';
 
 export const metadata: Metadata = {
   title: 'Study in the United Kingdom - World-Class Education & Russell Group Universities',
@@ -63,6 +64,15 @@ export const metadata: Metadata = {
 };
 
 export default function UKPage() {
+  // Track destination page view
+  if (typeof window !== 'undefined') {
+    trackDestinationInterest('UK', {
+      page: 'destinations/uk',
+      source: 'page_load',
+      device: getUserDevice()
+    });
+  }
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",

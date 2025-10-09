@@ -1,14 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackDashboardView, trackContentManagement } from '@/lib/analytics';
 import { Content } from '@/lib/types';
 
 export default function ContentPage() {
+  const { getAuthHeaders } = useAuth();
   const [contents, setContents] = useState<Content[]>([]);
+  const [filteredContents, setFilteredContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingContent, setEditingContent] = useState<Content | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -31,6 +37,31 @@ export default function ContentPage() {
     fetchContents();
   }, []);
 
+  // Filter contents based on selected filters
+  useEffect(() => {
+    let filtered = [...contents];
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(content => 
+        content.categories && content.categories.includes(selectedCategory)
+      );
+    }
+
+    // Filter by type
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(content => content.type === selectedType);
+    }
+
+    // Filter by status
+    if (selectedStatus !== 'all') {
+      const isPublished = selectedStatus === 'published';
+      filtered = filtered.filter(content => content.isPublished === isPublished);
+    }
+
+    setFilteredContents(filtered);
+  }, [contents, selectedCategory, selectedType, selectedStatus]);
+
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
@@ -48,7 +79,9 @@ export default function ContentPage() {
   const fetchContents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/content');
+      const response = await fetch('/api/admin/content', {
+        headers: getAuthHeaders()
+      });
       if (response.ok) {
         const data = await response.json();
         setContents(data);
@@ -133,9 +166,7 @@ export default function ContentPage() {
       
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       });
 
@@ -224,6 +255,7 @@ export default function ContentPage() {
       try {
         const response = await fetch(`/api/admin/content/${id}`, {
           method: 'DELETE',
+          headers: getAuthHeaders(),
         });
 
         if (response.ok) {
@@ -303,6 +335,77 @@ export default function ContentPage() {
         </button>
       </div>
 
+      {/* Filter Options */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter Content</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="Announcement">Announcement</option>
+              <option value="University">University</option>
+              <option value="Success">Success</option>
+              <option value="Partnership">Partnership</option>
+              <option value="News">News</option>
+            </select>
+          </div>
+
+          {/* Type Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Types</option>
+              <option value="page">Page</option>
+              <option value="blog">Blog</option>
+              <option value="update">Update</option>
+              <option value="service">Service</option>
+              <option value="destination">Destination</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Filter Summary */}
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Showing {filteredContents.length} of {contents.length} content items
+          </div>
+          <button
+            onClick={() => {
+              setSelectedCategory('all');
+              setSelectedType('all');
+              setSelectedStatus('all');
+            }}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
       {/* Content List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
@@ -327,57 +430,71 @@ export default function ContentPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {contents.map((content) => (
-                <tr key={content._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{content.title}</div>
-                      <div className="text-sm text-gray-500">/{content.slug}</div>
-                      {content.categories && content.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {content.categories.map((category, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
-                            >
-                              {category}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+              {filteredContents.length > 0 ? (
+                filteredContents.map((content) => (
+                  <tr key={content._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{content.title}</div>
+                        <div className="text-sm text-gray-500">/{content.slug}</div>
+                        {content.categories && content.categories.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {content.categories.map((category, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
+                              >
+                                {category}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {content.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        content.isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {content.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(content.updatedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(content)}
+                        className="text-blue-600 hover:text-blue-900 mr-3"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(content._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    <div className="flex flex-col items-center">
+                      <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <p className="text-lg font-medium">No content found</p>
+                      <p className="text-sm">Try adjusting your filters or create new content.</p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {content.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      content.isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {content.isPublished ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(content.updatedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(content)}
-                      className="text-blue-600 hover:text-blue-900 mr-3"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(content._id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

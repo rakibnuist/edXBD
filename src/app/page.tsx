@@ -19,6 +19,7 @@ import { trackApplicationStart, trackConsultationRequest } from '@/lib/analytics
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
 import AnimatedButton from '@/components/AnimatedButton';
+import EngagementTracker from '@/components/EngagementTracker';
 import { fadeInUp, fadeInDown, scaleIn, staggerContainer, staggerItem, float } from '@/lib/animations';
 
 // Import components normally for now - lazy loading can be added later
@@ -246,6 +247,9 @@ const Home = memo(function Home() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      {/* Engagement Tracking */}
+      <EngagementTracker pageName="home" />
+      
       {/* Optimized Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
         {/* Simplified Background Elements */}

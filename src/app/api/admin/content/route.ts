@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyTokenFromRequest } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Content from '@/models/Content';
 
 export async function GET(request: NextRequest) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
 
     const contents = await Content.find()
@@ -11,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(contents);
   } catch (error) {
-    // Error fetching contents
+    console.error('Fetch contents error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch contents' },
       { status: 500 }
@@ -21,6 +28,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
 
     const body = await request.json();

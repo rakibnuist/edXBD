@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyTokenFromRequest } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Content from '@/models/Content';
 
@@ -7,6 +8,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -20,7 +27,7 @@ export async function GET(
 
     return NextResponse.json(content);
   } catch (error) {
-    // Error fetching content
+    console.error('Fetch content error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch content' },
       { status: 500 }
@@ -33,6 +40,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -52,7 +65,7 @@ export async function PUT(
 
     return NextResponse.json(content);
   } catch (error) {
-    // Error updating content
+    console.error('Update content error:', error);
     return NextResponse.json(
       { error: 'Failed to update content' },
       { status: 500 }
@@ -65,6 +78,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const decoded = verifyTokenFromRequest(request);
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
     await connectDB();
     const { id } = await params;
 
@@ -78,7 +97,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Content deleted successfully' });
   } catch (error) {
-    // Error deleting content
+    console.error('Delete content error:', error);
     return NextResponse.json(
       { error: 'Failed to delete content' },
       { status: 500 }

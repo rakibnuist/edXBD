@@ -13,6 +13,7 @@ import {
   trackFormAbandonment,
   trackStudyAbroadFormSubmission
 } from '@/lib/analytics';
+import { trackFormSubmission, trackContactInteraction, getUserDevice } from '@/lib/vercel-analytics';
 
 const QuickContactForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -116,6 +117,16 @@ const QuickContactForm = () => {
       
       // Enhanced tracking with comprehensive conversion data
       await trackStudyAbroadFormSubmission(formData);
+      
+      // Track with Vercel Analytics
+      trackFormSubmission('contact', {
+        page: 'quick_contact_form',
+        source: 'modal',
+        user_type: 'new',
+        device: getUserDevice(),
+        country: formData.country,
+        program: formData.program
+      });
       
       // Submit to API
       const response = await fetch('/api/leads', {
@@ -446,6 +457,11 @@ const QuickContactForm = () => {
               href="https://wa.me/8801983333566"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackContactInteraction('whatsapp', {
+                page: 'quick_contact_form',
+                source: 'footer_link',
+                device: getUserDevice()
+              })}
               className="inline-flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
             >
               <MessageCircle className="w-4 h-4 mr-2" />
