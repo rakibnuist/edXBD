@@ -16,7 +16,7 @@ import {
   Headphones,
   Zap
 } from 'lucide-react';
-import PartnershipForm from '@/components/PartnershipForm';
+import EnhancedContactForm from '@/components/EnhancedContactForm';
 
 const PartnershipClient = () => {
 
@@ -400,7 +400,17 @@ const PartnershipClient = () => {
             </p>
           </motion.div>
 
-          <PartnershipForm />
+          <EnhancedContactForm
+            formType="partnership"
+            source="partnership_page"
+            title="Partnership Application"
+            description="Fill out the form below to apply for partnership with EduExpress International"
+            showCountry={true}
+            showProgram={false}
+            showMessage={true}
+            showLocation={true}
+            className="max-w-2xl mx-auto"
+          />
         </div>
       </section>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useMetaTracking } from '@/hooks/useMetaTracking';
+import CountryCodePhoneInput from './CountryCodePhoneInput';
 
 interface ContactFormData {
   name: string;
@@ -185,15 +186,12 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
             Phone Number *
           </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
+          <CountryCodePhoneInput
             value={formData.phone}
-            onChange={handleInputChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
             placeholder="Enter your phone number"
+            required
+            error={error && formData.phone === '' ? 'Phone number is required' : undefined}
           />
         </div>
 
