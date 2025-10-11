@@ -27,18 +27,23 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>(defaultStats);
   const [loading, setLoading] = useState(true);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'unknown'>('unknown');
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure component is mounted on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    // Only fetch data if user is authenticated and auth is not loading
-    if (isAuthenticated && !authLoading) {
+    // Only fetch data if user is authenticated, auth is not loading, and component is mounted
+    if (mounted && isAuthenticated && !authLoading) {
       // Track dashboard view
       trackDashboardView('admin_dashboard');
       
       fetchDashboardData();
       checkDatabaseStatus();
     }
-  }, [isAuthenticated, authLoading]);
+  }, [mounted, isAuthenticated, authLoading]);
 
   const checkDatabaseStatus = async () => {
     try {
