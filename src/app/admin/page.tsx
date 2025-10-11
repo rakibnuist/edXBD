@@ -14,17 +14,32 @@ interface DashboardStats {
   recentPartnerships: any[];
 }
 
+interface MetaStatus {
+  pixelId: string | null;
+  accessToken: string | null;
+  pixelActive: boolean;
+  conversionApiActive: boolean;
+  eventsTracked: number;
+}
+
 export default function AdminDashboardNew() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<DashboardStats>({
-    totalLeads: 0,
-    newLeads: 0,
-    totalTestimonials: 0,
-    totalCountries: 0,
-    totalPartnerships: 0,
-    newPartnerships: 0,
-    recentLeads: [],
-    recentPartnerships: []
+  totalLeads: 0,
+  newLeads: 0,
+  totalTestimonials: 0,
+  totalCountries: 0,
+  totalPartnerships: 0,
+  newPartnerships: 0,
+  recentLeads: [],
+  recentPartnerships: []
+  });
+  const [metaStatus, setMetaStatus] = useState<MetaStatus>({
+    pixelId: null,
+    accessToken: null,
+    pixelActive: false,
+    conversionApiActive: false,
+    eventsTracked: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +47,7 @@ export default function AdminDashboardNew() {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchData();
+      checkMetaStatus();
     }
   }, [isAuthenticated, authLoading]);
 
@@ -98,6 +114,26 @@ export default function AdminDashboardNew() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkMetaStatus = () => {
+    // Check Meta Pixel ID
+    const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || null;
+    
+    // Check Meta Access Token
+    const accessToken = process.env.META_ACCESS_TOKEN || null;
+    
+    // Determine if Meta services are active
+    const pixelActive = !!pixelId;
+    const conversionApiActive = !!accessToken;
+    
+    setMetaStatus({
+      pixelId,
+      accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : null, // Show partial token for security
+      pixelActive,
+      conversionApiActive,
+      eventsTracked: 0 // This would need to be fetched from Meta API in a real implementation
+    });
   };
 
   if (authLoading) {
@@ -175,6 +211,54 @@ export default function AdminDashboardNew() {
         </p>
       </div>
 
+      {/* Meta Connectivity Status */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+        <h3 className="font-bold text-blue-800 mb-3">Meta Connectivity Status</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${metaStatus.pixelActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm font-medium text-gray-700">Meta Pixel</span>
+            <span className={`text-xs px-2 py-1 rounded ${metaStatus.pixelActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {metaStatus.pixelActive ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${metaStatus.conversionApiActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm font-medium text-gray-700">Conversion API</span>
+            <span className={`text-xs px-2 py-1 rounded ${metaStatus.conversionApiActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              {metaStatus.conversionApiActive ? 'Active' : 'Inactive'}
+            </span>
+          </div>
+          
+          <div className="text-sm">
+            <span className="font-medium text-gray-700">Pixel ID:</span>
+            <span className="text-gray-600 ml-1">{metaStatus.pixelId || 'Not Set'}</span>
+              </div>
+          
+          <div className="text-sm">
+            <span className="font-medium text-gray-700">Access Token:</span>
+            <span className="text-gray-600 ml-1">{metaStatus.accessToken || 'Not Set'}</span>
+            </div>
+        </div>
+        
+        {!metaStatus.pixelActive && (
+          <div className="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded">
+            <p className="text-sm text-yellow-800">
+              <strong>Setup Required:</strong> Add NEXT_PUBLIC_META_PIXEL_ID to your environment variables to enable Meta Pixel tracking.
+            </p>
+          </div>
+        )}
+        
+        {!metaStatus.conversionApiActive && (
+          <div className="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded">
+            <p className="text-sm text-yellow-800">
+              <strong>Setup Required:</strong> Add META_ACCESS_TOKEN to your environment variables to enable Meta Conversion API tracking.
+            </p>
+          </div>
+        )}
+      </div>
+      
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md border">
@@ -266,41 +350,41 @@ export default function AdminDashboardNew() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Leads</h3>
-          {stats.recentLeads.length > 0 ? (
+            {stats.recentLeads.length > 0 ? (
             <div className="space-y-3">
               {stats.recentLeads.map((lead, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                  <div>
+                    <div>
                     <p className="font-medium text-gray-900">{lead.name}</p>
-                    <p className="text-sm text-gray-600">{lead.email}</p>
+                      <p className="text-sm text-gray-600">{lead.email}</p>
                   </div>
                   <span className="text-sm text-gray-500">{lead.country}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No recent leads</p>
-          )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No recent leads</p>
+            )}
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Partnerships</h3>
-          {stats.recentPartnerships.length > 0 ? (
+            {stats.recentPartnerships.length > 0 ? (
             <div className="space-y-3">
               {stats.recentPartnerships.map((partnership, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                  <div>
+                    <div>
                     <p className="font-medium text-gray-900">{partnership.companyName}</p>
                     <p className="text-sm text-gray-600">{partnership.contactEmail}</p>
                   </div>
                   <span className="text-sm text-gray-500">{partnership.country}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No recent partnerships</p>
-          )}
-        </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No recent partnerships</p>
+            )}
+          </div>
       </div>
     </div>
   );
