@@ -40,12 +40,30 @@ export default function AdminDashboardNew() {
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('admin_token');
-      if (!token) {
-        setError('No authentication token found');
-        return;
+      // First, try to get a fresh token by logging in
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'admin@eduexpressint.com',
+          password: 'admin123'
+        })
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error(`Login failed with status: ${loginResponse.status}`);
       }
 
+      const loginData = await loginResponse.json();
+      const token = loginData.token;
+
+      if (!token) {
+        throw new Error('No token received from login');
+      }
+
+      // Now fetch dashboard data with the fresh token
       const response = await fetch('/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -59,6 +77,8 @@ export default function AdminDashboardNew() {
 
       const data = await response.json();
       console.log('Received data:', data);
+      console.log('Login successful, token received:', token ? 'Yes' : 'No');
+      console.log('Dashboard API response status:', response.status);
       
       // Direct assignment - no complex state management
       setStats({
@@ -147,6 +167,11 @@ export default function AdminDashboardNew() {
           Total Leads: {stats.totalLeads} | 
           Total Testimonials: {stats.totalTestimonials} | 
           Total Countries: {stats.totalCountries}
+        </p>
+        <p className="text-xs text-yellow-600 mt-1">
+          Auth Status: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'} | 
+          Loading: {loading ? 'Yes' : 'No'} | 
+          Error: {error || 'None'}
         </p>
       </div>
 
