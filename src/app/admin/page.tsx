@@ -41,6 +41,7 @@ export default function AdminDashboardNew() {
     conversionApiActive: false,
     eventsTracked: 0
   });
+  const [metaLoading, setMetaLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -116,24 +117,38 @@ export default function AdminDashboardNew() {
     }
   };
 
-  const checkMetaStatus = () => {
-    // Check Meta Pixel ID
-    const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID || null;
-    
-    // Check Meta Access Token
-    const accessToken = process.env.META_ACCESS_TOKEN || null;
-    
-    // Determine if Meta services are active
-    const pixelActive = !!pixelId;
-    const conversionApiActive = !!accessToken;
-    
-    setMetaStatus({
-      pixelId,
-      accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : null, // Show partial token for security
-      pixelActive,
-      conversionApiActive,
-      eventsTracked: 0 // This would need to be fetched from Meta API in a real implementation
-    });
+  const checkMetaStatus = async () => {
+    try {
+      setMetaLoading(true);
+      const response = await fetch('/api/meta-status');
+      if (response.ok) {
+        const data = await response.json();
+        setMetaStatus(data);
+        console.log('Meta status fetched:', data);
+      } else {
+        console.error('Failed to fetch Meta status:', response.status);
+        // Set default values if API fails
+        setMetaStatus({
+          pixelId: null,
+          accessToken: null,
+          pixelActive: false,
+          conversionApiActive: false,
+          eventsTracked: 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching Meta status:', error);
+      // Set default values if API fails
+      setMetaStatus({
+        pixelId: null,
+        accessToken: null,
+        pixelActive: false,
+        conversionApiActive: false,
+        eventsTracked: 0
+      });
+    } finally {
+      setMetaLoading(false);
+    }
   };
 
   if (authLoading) {
@@ -213,7 +228,15 @@ export default function AdminDashboardNew() {
 
       {/* Meta Connectivity Status */}
       <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
-        <h3 className="font-bold text-blue-800 mb-3">Meta Connectivity Status</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-blue-800">Meta Connectivity Status</h3>
+          {metaLoading && (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <span className="text-xs text-blue-600">Loading...</span>
+            </div>
+          )}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
             <div className={`w-3 h-3 rounded-full ${metaStatus.pixelActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
