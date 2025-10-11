@@ -45,6 +45,15 @@ export default function AdminDashboard() {
     }
   }, [mounted, isAuthenticated, authLoading]);
 
+  // Force re-render when stats change
+  useEffect(() => {
+    if (mounted && stats.totalLeads > 0) {
+      // Force a re-render by updating a dummy state
+      setLoading(prev => !prev);
+      setTimeout(() => setLoading(false), 100);
+    }
+  }, [stats.totalLeads, mounted]);
+
   const checkDatabaseStatus = async () => {
     try {
       const response = await fetch('/api/test');
@@ -69,7 +78,18 @@ export default function AdminDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        setStats(data);
+        // Force a complete state update with a new object
+        const newStats = {
+          totalLeads: data.totalLeads || 0,
+          newLeads: data.newLeads || 0,
+          totalTestimonials: data.totalTestimonials || 0,
+          totalCountries: data.totalCountries || 0,
+          totalPartnerships: data.totalPartnerships || 0,
+          newPartnerships: data.newPartnerships || 0,
+          recentLeads: data.recentLeads || [],
+          recentPartnerships: data.recentPartnerships || []
+        };
+        setStats(newStats);
         trackDatabaseOperation('fetch_dashboard_data', true, {
           total_leads: data.totalLeads,
           new_leads: data.newLeads,
