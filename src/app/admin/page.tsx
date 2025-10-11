@@ -70,7 +70,6 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
-        setRefreshKey(prev => prev + 1); // Force re-render
         trackDatabaseOperation('fetch_dashboard_data', true, {
           total_leads: data.totalLeads,
           new_leads: data.newLeads,
@@ -144,7 +143,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div key={refreshKey}>
+    <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
         <div className="flex items-center space-x-4">
