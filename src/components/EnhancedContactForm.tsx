@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useMetaTracking } from '@/hooks/useMetaTracking';
 import CountryCodePhoneInput from './CountryCodePhoneInput';
+import { Send } from 'lucide-react';
 
 interface ContactFormData {
   name: string;
@@ -26,6 +27,7 @@ interface EnhancedContactFormProps {
   showMessage?: boolean;
   showLocation?: boolean;
   className?: string;
+  onSubmit?: () => void; // Callback for form submission
 }
 
 const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
@@ -37,7 +39,8 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
   showProgram = true,
   showMessage = true,
   showLocation = false,
-  className = ''
+  className = '',
+  onSubmit
 }) => {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
@@ -101,6 +104,11 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
         country: formData.country
       });
 
+      // Call the onSubmit callback if provided
+      if (onSubmit) {
+        onSubmit();
+      }
+
     } catch (err) {
       setError('Failed to submit form. Please try again.');
       console.error('Form submission error:', err);
@@ -140,16 +148,16 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-        <p className="text-gray-600">{description}</p>
+    <div className={`bg-white/98 backdrop-blur-lg rounded-xl shadow-2xl border border-white/30 p-4 ${className}`}>
+      <div className="text-center mb-3">
+        <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">{title}</h2>
+        <p className="text-gray-600 text-sm">{description}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-1">
             Full Name *
           </label>
           <input
@@ -159,14 +167,14 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
             value={formData.name}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 text-sm border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg"
             placeholder="Enter your full name"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-1">
             Email Address *
           </label>
           <input
@@ -176,23 +184,25 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
             value={formData.email}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 text-sm border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg"
             placeholder="Enter your email address"
           />
         </div>
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-1">
             Phone Number *
           </label>
-          <CountryCodePhoneInput
-            value={formData.phone}
-            onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
-            placeholder="Enter your phone number"
-            required
-            error={error && formData.phone === '' ? 'Phone number is required' : undefined}
-          />
+          <div className="border border-gray-300/60 rounded-lg focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md focus-within:shadow-lg">
+            <CountryCodePhoneInput
+              value={formData.phone}
+              onChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
+              placeholder="Enter your phone number"
+              required
+              error={error && formData.phone === '' ? 'Phone number is required' : undefined}
+            />
+          </div>
         </div>
 
         {/* Country */}
@@ -300,7 +310,7 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
         {/* Message */}
         {showMessage && (
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="message" className="block text-xs font-semibold text-gray-800 mb-0.5">
               Message (Optional)
             </label>
             <textarea
@@ -308,8 +318,8 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
               name="message"
               value={formData.message}
               onChange={handleInputChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={3}
+              className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
               placeholder="Tell us more about your study abroad goals..."
             />
           </div>
@@ -322,19 +332,32 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
           </div>
         )}
 
-        {/* Submit button */}
+        {/* Enhanced Submit button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white py-3 px-6 rounded-xl font-bold text-sm shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] border border-white/20 relative overflow-hidden"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Request'}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          <div className="flex items-center justify-center space-x-2 relative z-10">
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <span>Submit Request</span>
+                <Send className="w-4 h-4" />
+              </>
+            )}
+          </div>
         </button>
       </form>
 
       {/* Contact options */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <p className="text-center text-sm text-gray-600 mb-4">Or contact us directly:</p>
+      <div className="mt-3 pt-3 border-t border-gray-200">
+        <p className="text-center text-xs text-gray-600 mb-2">Or contact us directly:</p>
         <div className="flex justify-center space-x-4">
           <a
             href="https://wa.me/8801983333566"

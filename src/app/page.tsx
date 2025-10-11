@@ -250,45 +250,99 @@ const Home = memo(function Home() {
       {/* Engagement Tracking */}
       <EngagementTracker pageName="home" />
       
-      {/* Optimized Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        {/* Simplified Background Elements */}
+      {/* Compact Hero Section */}
+      <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        {/* Enhanced Background Elements with Glassmorphism */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Main gradient orbs */}
           <motion.div 
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-400/15 to-purple-400/15 rounded-full blur-3xl"
             variants={float}
             animate="animate"
           />
           <motion.div 
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/10 to-orange-400/10 rounded-full blur-3xl"
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-400/15 to-orange-400/15 rounded-full blur-3xl"
             variants={float}
             animate="animate"
             transition={{ delay: 1 }}
           />
+          
+          {/* Additional floating elements */}
+          <motion.div 
+            className="absolute top-1/3 right-1/3 w-64 h-64 bg-gradient-to-r from-green-400/10 to-emerald-400/10 rounded-full blur-2xl"
+            animate={{ 
+              y: [0, -20, 0],
+              x: [0, 15, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          
+          {/* Glassmorphism floating shapes */}
+          <motion.div
+            className="absolute top-20 left-20 w-32 h-32 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
+            animate={{ 
+              y: [0, -30, 0],
+              x: [0, 20, 0],
+              rotate: [0, 180, 360]
+            }}
+            transition={{ 
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-32 right-32 w-24 h-24 bg-white/10 backdrop-blur-sm rounded-full border border-white/20"
+            animate={{ 
+              y: [0, 25, 0],
+              x: [0, -15, 0],
+              rotate: [0, -180, -360]
+            }}
+            transition={{ 
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.5
+            }}
+          />
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center max-w-6xl mx-auto">
-            {/* Trust Badge */}
+          <div className="text-center max-w-5xl mx-auto">
+            {/* Compact Trust Badge */}
             <AnimatedSection animation="fadeInDown" delay={0.2}>
-              <div className="mb-8">
+              <div className="mb-4">
                 <motion.div 
-                  className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm border border-blue-200/50 rounded-full px-6 py-3 shadow-lg"
-                  whileHover={{ scale: 1.05 }}
+                  className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-md border border-blue-200/60 rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+                  whileHover={{ scale: 1.05, y: -2 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <div className="w-3 h-3 bg-green-500 rounded-full" />
-                  <span className="text-sm font-semibold text-gray-700">
+                  <motion.div 
+                    className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="text-xs font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
                     🏆 Trusted Since 2018 • 3000+ Students Got Scholarships
                   </span>
-                  <div className="w-3 h-3 bg-blue-500 rounded-full" />
+                  <motion.div 
+                    className="w-2 h-2 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                  />
                 </motion.div>
               </div>
             </AnimatedSection>
 
-            {/* Main Heading */}
+            {/* Compact Main Heading */}
             <AnimatedSection animation="fadeInUp" delay={0.4}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mb-6 sm:mb-8 font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-3 sm:mb-4 font-bold leading-tight">
                 <motion.span 
                   className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent"
                   initial={{ opacity: 0, y: 50 }}
@@ -308,50 +362,69 @@ const Home = memo(function Home() {
               </h1>
             </AnimatedSection>
 
-            {/* Value Proposition */}
-            <div className="mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+            {/* Compact Value Proposition */}
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
                 🎓 <span className="bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">FREE</span> Scholarship Assistance
               </h2>
             </div>
 
-            {/* Subtitle */}
-            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed">
+            {/* Compact Subtitle */}
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
               Transform your education journey with expert study abroad consultancy. 
               <span className="font-bold text-green-600"> FREE scholarship assistance</span> since 2018. 
               <span className="font-bold text-blue-600"> 97% success rate</span> helping 3000+ students study at top universities worldwide.
             </p>
 
-            {/* Enhanced Mobile CTA Buttons */}
+            {/* Compact CTA Buttons */}
             <AnimatedSection animation="fadeInUp" delay={1.2}>
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4">
-                <AnimatedButton
+                <motion.button
                   onClick={() => {
                     trackConsultationRequest('hero_cta');
                     window.dispatchEvent(new CustomEvent('openQuickForm'));
                   }}
-                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-lg px-8 py-4 rounded-full font-semibold shadow-2xl hover:shadow-3xl min-h-[56px] touch-manipulation active:scale-95 mobile-flex-center"
-                  icon={<ArrowRight className="w-5 h-5" />}
-                  iconPosition="right"
+                  className="group relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white text-base px-8 py-3 rounded-full font-bold shadow-xl hover:shadow-2xl min-h-[48px] touch-manipulation active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  Get FREE Consultation
-                </AnimatedButton>
+                  <div className="flex items-center space-x-2">
+                    <span>Get FREE Consultation</span>
+                    <motion.div
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.div>
+                  </div>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                </motion.button>
                 
-                <AnimatedButton
+                <motion.button
                   onClick={() => trackApplicationStart('phone_call')}
-                  variant="outline"
-                  className="group relative bg-white hover:bg-gray-50 text-blue-600 text-lg px-8 py-4 rounded-full font-semibold shadow-xl border-2 border-blue-600 hover:border-blue-700 min-h-[56px] touch-manipulation active:scale-95 mobile-flex-center"
-                  icon={<Phone className="w-5 h-5" />}
-                  iconPosition="left"
+                  className="group relative bg-white/90 backdrop-blur-md hover:bg-white text-blue-600 text-base px-8 py-3 rounded-full font-bold shadow-lg border-2 border-blue-600/50 hover:border-blue-700 min-h-[48px] touch-manipulation active:scale-95 transition-all duration-300 hover:shadow-xl"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  Call Now
-                </AnimatedButton>
+                  <div className="flex items-center space-x-2">
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Phone className="w-4 h-4" />
+                    </motion.div>
+                    <span>Call Now</span>
+                  </div>
+                </motion.button>
               </div>
             </AnimatedSection>
 
-            {/* Enhanced Mobile Stats Preview */}
+            {/* Compact Stats Preview */}
             <AnimatedSection animation="stagger" delay={1.4}>
-              <div className="mt-12 sm:mt-16 grid mobile-grid-2 sm:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto mobile-p-4">
+              <div className="mt-6 sm:mt-8 grid mobile-grid-2 sm:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto mobile-p-4">
                 {[
                   { value: "3000+", label: "Students Helped", icon: "🎓" },
                   { value: "97%", label: "Success Rate", icon: "🏆" },
@@ -360,23 +433,26 @@ const Home = memo(function Home() {
                 ].map((stat, index) => (
                   <motion.div
                     key={stat.label}
-                    className="text-center mobile-p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mobile-card touch-manipulation"
+                    className="text-center p-4 bg-white/80 backdrop-blur-md rounded-2xl border border-white/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mobile-card touch-manipulation group"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.6 + index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
+                    whileHover={{ scale: 1.05, y: -4 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <motion.div 
-                      className="text-2xl sm:text-3xl mb-2"
+                      className="text-2xl sm:text-3xl mb-2 group-hover:scale-110 transition-transform duration-300"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 1.8 + index * 0.1, type: "spring", stiffness: 200 }}
                     >
                       {stat.icon}
                     </motion.div>
-                    <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1 mobile-text-large">{stat.value}</div>
-                    <div className="text-xs sm:text-sm text-gray-600 font-medium mobile-text-small">{stat.label}</div>
+                    <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1 mobile-text-large">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-gray-700 font-semibold mobile-text-small">{stat.label}</div>
+                    
+                    {/* Subtle glow effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </motion.div>
                 ))}
               </div>

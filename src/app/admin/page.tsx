@@ -23,18 +23,22 @@ const defaultStats: DashboardStats = {
 };
 
 export default function AdminDashboard() {
-  const { getAuthHeaders } = useAuth();
+  const { getAuthHeaders, isAuthenticated, loading: authLoading, user } = useAuth();
   const [stats, setStats] = useState<DashboardStats>(defaultStats);
   const [loading, setLoading] = useState(true);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'unknown'>('unknown');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    // Track dashboard view
-    trackDashboardView('admin_dashboard');
-    
-    fetchDashboardData();
-    checkDatabaseStatus();
-  }, []);
+    // Only fetch data if user is authenticated and auth is not loading
+    if (isAuthenticated && !authLoading) {
+      // Track dashboard view
+      trackDashboardView('admin_dashboard');
+      
+      fetchDashboardData();
+      checkDatabaseStatus();
+    }
+  }, [isAuthenticated, authLoading]);
 
   const checkDatabaseStatus = async () => {
     try {
@@ -57,9 +61,11 @@ export default function AdminDashboard() {
       const response = await fetch('/api/admin/dashboard', {
         headers: getAuthHeaders()
       });
+      
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+        setRefreshKey(prev => prev + 1); // Force re-render
         trackDatabaseOperation('fetch_dashboard_data', true, {
           total_leads: data.totalLeads,
           new_leads: data.newLeads,
@@ -102,20 +108,38 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
+
+  // Show loading while auth is being checked or data is being fetched
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-lg text-gray-600">Loading dashboard...</div>
-          <div className="text-sm text-gray-500 mt-2">Connecting to database...</div>
+          <div className="text-lg text-gray-600">
+            {authLoading ? 'Checking authentication...' : 'Loading dashboard...'}
+          </div>
+          <div className="text-sm text-gray-500 mt-2">
+            {authLoading ? 'Verifying user credentials...' : 'Connecting to database...'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-lg text-gray-600">Authentication required</div>
+          <div className="text-sm text-gray-500 mt-2">Please login to access the dashboard</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div key={refreshKey}>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
         <div className="flex items-center space-x-4">

@@ -253,36 +253,36 @@ const PartnershipForm = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <Building2 className="w-10 h-10 text-blue-600 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-gray-900">Basic Information</h3>
-              <p className="text-gray-600 text-sm">Tell us about your company and contact details</p>
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <h3 className="text-lg font-bold text-gray-900">Basic Information</h3>
+              <p className="text-gray-600 text-xs">Tell us about your company and contact details</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Company Name
                 </label>
                 <input
                   type="text"
                   value={formData.companyName}
                   onChange={(e) => updateFormData('companyName', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors hover:border-gray-400"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors hover:border-gray-400"
                   placeholder="Your company name (optional)"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Contact Person *
                 </label>
                 <input
                   type="text"
                   value={formData.contactPerson}
                   onChange={(e) => updateFormData('contactPerson', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
                     errors.contactPerson 
                       ? 'border-red-500 bg-red-50' 
                       : formData.contactPerson 
@@ -295,14 +295,14 @@ const PartnershipForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Email Address *
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateFormData('email', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
                     errors.email 
                       ? 'border-red-500 bg-red-50' 
                       : formData.email 
@@ -315,14 +315,14 @@ const PartnershipForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Phone Number *
                 </label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => updateFormData('phone', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
                     errors.phone 
                       ? 'border-red-500 bg-red-50' 
                       : formData.phone 
@@ -335,14 +335,14 @@ const PartnershipForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   City *
                 </label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => updateFormData('city', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
                     errors.city 
                       ? 'border-red-500 bg-red-50' 
                       : formData.city 
@@ -355,14 +355,14 @@ const PartnershipForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Country *
                 </label>
                 <input
                   type="text"
                   value={formData.country}
                   onChange={(e) => updateFormData('country', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
+                  className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm transition-colors ${
                     errors.country 
                       ? 'border-red-500 bg-red-50' 
                       : formData.country 
@@ -379,14 +379,14 @@ const PartnershipForm = () => {
 
       case 2:
         return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <Briefcase className="w-10 h-10 text-blue-600 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-gray-900">Partnership Details</h3>
-              <p className="text-gray-600 text-sm">Tell us about your partnership goals</p>
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <Briefcase className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <h3 className="text-lg font-bold text-gray-900">Partnership Details</h3>
+              <p className="text-gray-600 text-xs">Tell us about your partnership goals</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Partnership Type *
@@ -426,7 +426,7 @@ const PartnershipForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Why do you want to partner with us? *
                 </label>
                 <textarea
@@ -498,16 +498,16 @@ const PartnershipForm = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-      {/* Progress Bar */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-3">
+    <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Compact Progress Bar */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold">{currentStep}</span>
+            <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">{currentStep}</span>
             </div>
             <div>
-              <span className="text-sm font-semibold text-gray-900">
+              <span className="text-xs font-semibold text-gray-900">
                 Step {currentStep} of {totalSteps}
               </span>
               <div className="text-xs text-gray-600">
@@ -515,13 +515,13 @@ const PartnershipForm = () => {
               </div>
             </div>
           </div>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-xs font-medium text-gray-700">
             {Math.round((currentStep / totalSteps) * 100)}% Complete
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 rounded-full h-1.5">
           <motion.div
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -530,7 +530,7 @@ const PartnershipForm = () => {
       </div>
 
       {/* Form Content */}
-      <div className="p-6">
+      <div className="p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -544,11 +544,11 @@ const PartnershipForm = () => {
         </AnimatePresence>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
+        <div className="flex justify-between mt-4 pt-3 border-t border-gray-200">
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-md transition-colors text-xs ${
               currentStep === 1
                 ? 'text-gray-400 cursor-not-allowed'
                 : 'text-gray-700 hover:bg-gray-100'

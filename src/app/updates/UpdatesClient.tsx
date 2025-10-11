@@ -25,13 +25,22 @@ export default function UpdatesClient() {
     try {
       setLoading(true);
       const response = await fetch('/api/updates');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data: UpdatesResponse = await response.json();
       
-      setUpdates(data.updates);
-      setCategories(data.categories);
+      setUpdates(data.updates || []);
+      setCategories(data.categories || ['All']);
       setAuthors(data.authors || ['All']);
     } catch (error) {
       console.error('Error fetching updates:', error);
+      // Set empty arrays on error so UI doesn't get stuck
+      setUpdates([]);
+      setCategories(['All']);
+      setAuthors(['All']);
     } finally {
       setLoading(false);
     }

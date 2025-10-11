@@ -319,13 +319,13 @@ const CountryCodePhoneInput: React.FC<CountryCodePhoneInputProps> = ({
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             disabled={disabled}
-            className={`flex items-center space-x-2 px-3 py-2 border border-r-0 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            className={`flex items-center space-x-2 px-3 py-2 border border-r-0 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-transparent ${
               error
                 ? 'border-red-500 bg-red-50'
-                : 'border-gray-300 bg-white hover:bg-gray-50'
+                : 'border-gray-300/60 bg-white/90 hover:bg-gray-50'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
-            <span className="text-lg">{selectedCountry.flag}</span>
+            <span className="text-base">{selectedCountry.flag}</span>
             <span className="text-sm font-medium text-gray-700">{selectedCountry.dialCode}</span>
             <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
@@ -381,10 +381,10 @@ const CountryCodePhoneInput: React.FC<CountryCodePhoneInputProps> = ({
             placeholder={placeholder}
             required={required}
             disabled={disabled}
-            className={`w-full px-3 py-2 border rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            className={`w-full px-3 py-2 text-sm border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-transparent ${
               error
                 ? 'border-red-500 bg-red-50'
-                : 'border-gray-300 hover:border-gray-400 focus:border-blue-500'
+                : 'border-gray-300/60 hover:border-gray-400 focus:border-blue-500'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
         </div>
@@ -395,10 +395,6 @@ const CountryCodePhoneInput: React.FC<CountryCodePhoneInputProps> = ({
         <p className="mt-1 text-sm text-red-600">{error}</p>
       )}
 
-      {/* Helper Text */}
-      <p className="mt-1 text-xs text-gray-500">
-        Full number: {selectedCountry.dialCode}{phoneNumber || 'XXXXXXXXXX'}
-      </p>
     </div>
   );
 };
