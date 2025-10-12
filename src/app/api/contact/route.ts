@@ -9,12 +9,35 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     
-    // Validate required fields
-    const { firstName, lastName, email, phone, message } = body;
+    // Handle both name formats (single name field or firstName/lastName)
+    let fullName: string;
+    let firstName: string;
+    let lastName: string;
     
-    if (!firstName || !lastName || !email || !phone || !message) {
+    if (body.name) {
+      // Single name field format
+      fullName = body.name.trim();
+      const nameParts = fullName.split(' ');
+      firstName = nameParts[0] || '';
+      lastName = nameParts.slice(1).join(' ') || '';
+    } else if (body.firstName && body.lastName) {
+      // Separate firstName/lastName format
+      firstName = body.firstName.trim();
+      lastName = body.lastName.trim();
+      fullName = `${firstName} ${lastName}`;
+    } else {
       return NextResponse.json(
-        { error: 'Missing required fields: firstName, lastName, email, phone, and message are required' },
+        { error: 'Missing required fields: name (or firstName and lastName), email, and phone are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate required fields
+    const { email, phone, message } = body;
+    
+    if (!email || !phone) {
+      return NextResponse.json(
+        { error: 'Missing required fields: email and phone are required' },
         { status: 400 }
       );
     }
@@ -27,9 +50,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Create full name from first and last name
-    const fullName = `${firstName} ${lastName}`;
     
     // Create new lead from contact form
     const lead = new Lead({
@@ -37,24 +57,29 @@ export async function POST(request: NextRequest) {
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
       country: body.country || 'Not specified',
-      program: 'Contact Form Inquiry',
-      message: message.trim(),
-      source: 'contact_form',
+      program: body.program || 'Contact Form Inquiry',
+      message: message ? message.trim() : 'Consultation request from ' + (body.country || 'Unknown'),
+      source: body.source || 'contact_form',
       status: 'new'
     });
     
     await lead.save();
 
-    // Track lead with Meta Conversion API
+    // Track lead with Meta Conversion API (non-blocking)
     try {
-      await trackStudyAbroadLead({
+      // Run tracking in background without awaiting
+      trackStudyAbroadLead({
         name: fullName,
+        firstName: firstName,
+        lastName: lastName,
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
         country: body.country || 'Not specified',
-        program: 'Contact Form Inquiry',
-        message: message.trim()
-      }, 'contact_form', request);
+        program: body.program || 'Contact Form Inquiry',
+        message: message ? message.trim() : 'Consultation request from ' + (body.country || 'Unknown')
+      }, body.source || 'contact_form', request).catch(trackingError => {
+        console.error('Meta Conversion API tracking error (non-blocking):', trackingError);
+      });
     } catch (trackingError) {
       console.error('Meta Conversion API tracking error:', trackingError);
       // Don't fail the request if tracking fails

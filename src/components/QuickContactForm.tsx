@@ -24,11 +24,12 @@ const QuickContactForm = () => {
   }, []);
 
   const handleFormSubmit = () => {
-        setIsSubmitted(true);
+    // This callback is called when the form is successfully submitted
+    setIsSubmitted(true);
     // Close modal after 3 seconds
-        setTimeout(() => {
-          setIsOpen(false);
-          setIsSubmitted(false);
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsSubmitted(false);
     }, 3000);
   };
 

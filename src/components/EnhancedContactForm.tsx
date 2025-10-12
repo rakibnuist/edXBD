@@ -57,6 +57,7 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastSubmissionTime, setLastSubmissionTime] = useState<number>(0);
   
   const { trackFormSubmission, trackButtonClick } = useMetaTracking();
 
@@ -70,39 +71,127 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      console.log('Form already submitting, ignoring duplicate submission');
+      return;
+    }
+
+    // Prevent rapid successive submissions (within 2 seconds)
+    const now = Date.now();
+    if (now - lastSubmissionTime < 2000) {
+      console.log('Form submitted too recently, ignoring duplicate submission');
+      return;
+    }
+    setLastSubmissionTime(now);
+    
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Track form submission with enhanced Meta tracking
-      trackFormSubmission(formType, formData, source);
+      // Client-side validation
+      if (!formData.name || !formData.email || !formData.phone) {
+        setError('Please fill in all required fields (Name, Email, Phone)');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Additional validation for empty strings
+      if (formData.name.trim() === '' || formData.email.trim() === '' || formData.phone.trim() === '') {
+        setError('Please fill in all required fields (Name, Email, Phone)');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError('Please enter a valid email address');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Ensure message field has a value (required by API)
+      const submitData = {
+        ...formData,
+        message: formData.message || 'Consultation request from ' + formData.country,
+        formType,
+        source
+      };
+
+      console.log('Submitting form data:', submitData);
+      console.log('Form validation check:', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        program: formData.program
+      });
+      console.log('Field lengths:', {
+        nameLength: formData.name?.length || 0,
+        emailLength: formData.email?.length || 0,
+        phoneLength: formData.phone?.length || 0
+      });
+      console.log('Form state at submission:', {
+        isSubmitting,
+        isSubmitted,
+        error
+      });
+
+      // Track form submission with enhanced Meta tracking (completely non-blocking)
+      setTimeout(() => {
+        try {
+          trackFormSubmission(formType, formData, source);
+        } catch (trackingError) {
+          console.warn('Meta tracking error (non-blocking):', trackingError);
+        }
+      }, 0);
 
       // Submit form data to your API
+      console.log('Making API request to /api/contact');
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          formType,
-          source
-        }),
+        body: JSON.stringify(submitData),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || 'Failed to submit form');
       }
+
+      const result = await response.json();
+      console.log('Success result:', result);
 
       setIsSubmitted(true);
       
-      // Track successful submission
-      trackButtonClick('consultation', source, {
-        email: formData.email,
-        firstName: formData.name.split(' ')[0],
-        lastName: formData.name.split(' ').slice(1).join(' '),
-        country: formData.country
-      });
+      // Track successful submission (completely non-blocking)
+      setTimeout(() => {
+        try {
+          trackButtonClick('consultation', source, {
+            email: formData.email,
+            firstName: formData.name.split(' ')[0],
+            lastName: formData.name.split(' ').slice(1).join(' '),
+            country: formData.country
+          });
+        } catch (trackingError) {
+          console.warn('Success tracking error (non-blocking):', trackingError);
+        }
+      }, 0);
 
       // Call the onSubmit callback if provided
       if (onSubmit) {
@@ -110,8 +199,19 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
       }
 
     } catch (err) {
-      setError('Failed to submit form. Please try again.');
       console.error('Form submission error:', err);
+      console.error('Error type:', typeof err);
+      console.error('Error name:', err instanceof Error ? err.name : 'Unknown');
+      console.error('Error message:', err instanceof Error ? err.message : String(err));
+      console.error('Error stack:', err instanceof Error ? err.stack : 'No stack trace');
+      
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to submit form. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

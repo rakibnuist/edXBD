@@ -28,25 +28,25 @@ export const countries: Country[] = [
     name: 'South Korea',
     slug: 'south-korea',
     flag: '🇰🇷',
-    description: 'Technology and tradition blend',
-    universities: ['Seoul National University', 'KAIST', 'Yonsei University'],
-    programs: ['Engineering', 'Technology', 'Business', 'Medicine', 'Arts', 'EAP/KAP'],
+    description: 'World-class technology education with K-culture immersion',
+    universities: ['Seoul National University', 'KAIST', 'Yonsei University', 'Korea University', 'Hanyang University', 'Sungkyunkwan University'],
+    programs: ['Engineering & Technology', 'Business Administration', 'Medicine & Healthcare', 'Arts & Design', 'Korean Language (EAP/KAP)', 'Computer Science', 'International Studies'],
     requirements: {
-      language: ['TOPIK 3+ (Korean programs)', 'IELTS 6.0+ (English programs)'],
-      documents: ['Academic Transcripts', 'Language Certificate', 'Health Certificate'],
-      visa: ['Certificate of Admission', 'Financial Documents', 'Passport Copy']
+      language: ['TOPIK 3+ (Korean programs)', 'IELTS 6.0+ (English programs)', 'TOEFL 80+ (English programs)'],
+      documents: ['Academic Transcripts', 'Language Certificate', 'Health Certificate', 'Financial Statement', 'Passport Copy', 'Application Form'],
+      visa: ['Certificate of Admission (COA)', 'Financial Documents ($10,000+ proof)', 'Passport Copy', 'Visa Application Form', 'Health Insurance']
     },
     costs: {
-      tuition: '$3,000 - $7,000',
-      living: '$3,000 - $6,000',
+      tuition: '$3,000 - $8,000 per year',
+      living: '$4,000 - $7,000 per year',
       currency: 'USD'
     },
-    scholarships: ['Korean Government Scholarship', 'University-specific Scholarships'],
+    scholarships: ['Korean Government Scholarship (KGSP)', 'Global Korea Scholarship (GKS)', 'University-specific Scholarships', 'Research Assistantships', 'Teaching Assistantships'],
     isActive: true,
     featured: true,
-    images: [],
-    metaTitle: 'Study in South Korea - Technology Excellence',
-    metaDescription: 'Study in South Korea with EAP/KAP programs and technology excellence'
+    images: ['/images/destinations/south-korea-1.jpg', '/images/destinations/south-korea-2.jpg'],
+    metaTitle: 'Study in South Korea 2025 - Top Universities & Scholarships | EduExpress',
+    metaDescription: 'Study in South Korea with world-class universities like SNU, KAIST, Yonsei. Get FREE scholarship assistance for Korean Government Scholarship (KGSP) and university programs. Expert guidance for Bangladeshi students.'
   },
   {
     name: 'United Kingdom',
@@ -124,25 +124,25 @@ export const countries: Country[] = [
     name: 'Croatia',
     slug: 'croatia',
     flag: '🇭🇷',
-    description: 'Adriatic coast education',
-    universities: ['University of Zagreb', 'University of Split', 'University of Rijeka'],
-    programs: ['Engineering', 'Medicine', 'Business', 'Arts', 'Tourism'],
+    description: 'Affordable EU education with stunning Adriatic coastline',
+    universities: ['University of Zagreb', 'University of Split', 'University of Rijeka', 'University of Dubrovnik', 'Josip Juraj Strossmayer University'],
+    programs: ['Engineering & Technology', 'Medicine & Healthcare', 'Business & Economics', 'Arts & Humanities', 'Tourism & Hospitality', 'Marine Sciences', 'Computer Science'],
     requirements: {
-      language: ['IELTS 6.0+', 'TOEFL 80+'],
-      documents: ['Academic Transcripts', 'Language Certificate', 'Health Certificate'],
-      visa: ['Admission Letter', 'Financial Documents', 'Passport Copy']
+      language: ['IELTS 6.0+', 'TOEFL 80+', 'Croatian language certificate (for Croatian programs)'],
+      documents: ['Academic Transcripts', 'Language Certificate', 'Health Certificate', 'Financial Statement', 'Passport Copy', 'Motivation Letter'],
+      visa: ['Admission Letter', 'Financial Documents (€5,000+ proof)', 'Passport Copy', 'Health Insurance', 'Accommodation Proof']
     },
     costs: {
-      tuition: '€2,000 - €5,000',
-      living: '€3,000 - €5,000',
+      tuition: '€2,000 - €6,000 per year',
+      living: '€3,000 - €5,000 per year',
       currency: 'EUR'
     },
-    scholarships: ['Croatian Government Scholarship', 'University-specific Scholarships'],
+    scholarships: ['Croatian Government Scholarship', 'University-specific Scholarships', 'Erasmus+ Program', 'Bilateral Agreements', 'Research Grants'],
     isActive: true,
     featured: true,
-    images: [],
-    metaTitle: 'Study in Croatia - Adriatic Coast Education',
-    metaDescription: 'Study in Croatia with Adriatic coast education and rich cultural heritage'
+    images: ['/images/destinations/croatia-1.jpg', '/images/destinations/croatia-2.jpg'],
+    metaTitle: 'Study in Croatia 2025 - EU Education & Scholarships | EduExpress',
+    metaDescription: 'Study in Croatia with affordable EU education, stunning Adriatic coastline, and scholarship opportunities. Expert guidance for Bangladeshi students to study in EU with low costs.'
   },
   {
     name: 'Georgia',

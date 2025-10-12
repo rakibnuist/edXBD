@@ -90,19 +90,34 @@ export default function ContentPage() {
       });
       
       console.log('Content API response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (response.ok) {
         const data = await response.json();
         setContents(data);
         console.log('Contents fetched successfully:', data);
+        console.log('Number of contents:', data.length);
       } else {
         const errorData = await response.json();
         console.error('Failed to fetch contents:', errorData);
-        showMessage('error', `Failed to fetch contents: ${errorData.error || 'Unknown error'}`);
+        console.error('Response status:', response.status);
+        console.error('Response statusText:', response.statusText);
+        
+        if (response.status === 403) {
+          showMessage('error', 'Access denied. Please log in as an admin.');
+        } else if (response.status === 500) {
+          showMessage('error', 'Server error. Please check if the database is connected.');
+        } else {
+          showMessage('error', `Failed to fetch contents: ${errorData.error || 'Unknown error'}`);
+        }
       }
     } catch (error) {
       console.error('Error fetching contents:', error);
-      showMessage('error', 'Network error while fetching contents');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        showMessage('error', 'Network error. Please check your internet connection and try again.');
+      } else {
+        showMessage('error', 'Network error while fetching contents');
+      }
     } finally {
       setLoading(false);
     }

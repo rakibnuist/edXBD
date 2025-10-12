@@ -15,6 +15,8 @@ export default function SetupPage() {
   const [success, setSuccess] = useState('');
   const [adminExists, setAdminExists] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [dbInitialized, setDbInitialized] = useState(false);
+  const [initializingDb, setInitializingDb] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -79,6 +81,34 @@ export default function SetupPage() {
     }
   };
 
+  const initializeDatabase = async () => {
+    setInitializingDb(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const response = await fetch('/api/init-db', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess('Database initialized successfully with sample data!');
+        setDbInitialized(true);
+      } else {
+        setError(data.error || 'Failed to initialize database');
+      }
+    } catch (error) {
+      setError('Network error while initializing database');
+    } finally {
+      setInitializingDb(false);
+    }
+  };
+
   if (checking) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -123,6 +153,31 @@ export default function SetupPage() {
           </p>
         </div>
         
+        {/* Database Initialization Section */}
+        <div className="bg-white p-6 rounded-lg shadow mb-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Database Setup</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Initialize the database with sample content, countries, and testimonials.
+          </p>
+          <button
+            type="button"
+            onClick={initializeDatabase}
+            disabled={initializingDb || dbInitialized}
+            className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {initializingDb ? (
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Initializing Database...
+              </div>
+            ) : dbInitialized ? (
+              'Database Initialized ✓'
+            ) : (
+              'Initialize Database'
+            )}
+          </button>
+        </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
