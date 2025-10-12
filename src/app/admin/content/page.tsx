@@ -79,9 +79,18 @@ export default function ContentPage() {
   const fetchContents = async () => {
     try {
       setLoading(true);
+      
+      // Debug: Check what headers we're getting
+      const headers = getAuthHeaders();
+      console.log('Auth headers:', headers);
+      console.log('Token from localStorage:', localStorage.getItem('admin_token') ? 'Token exists' : 'No token');
+      
       const response = await fetch('/api/admin/content', {
-        headers: getAuthHeaders()
+        headers: headers
       });
+      
+      console.log('Content API response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
         setContents(data);
