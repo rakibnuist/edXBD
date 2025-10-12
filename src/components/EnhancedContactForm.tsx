@@ -240,9 +240,29 @@ const EnhancedContactForm: React.FC<EnhancedContactFormProps> = ({
       <div className={`bg-green-50 border border-green-200 rounded-lg p-6 text-center ${className}`}>
         <div className="text-green-600 text-4xl mb-4">✓</div>
         <h3 className="text-xl font-semibold text-green-800 mb-2">Thank You!</h3>
-        <p className="text-green-700">
+        <p className="text-green-700 mb-4">
           Your {formType} request has been submitted successfully. Our team will contact you within 24 hours.
         </p>
+        <button
+          onClick={() => {
+            setIsSubmitted(false);
+            setFormData({
+              name: '',
+              email: '',
+              phone: '',
+              country: '',
+              program: '',
+              message: '',
+              city: '',
+              state: '',
+              zipCode: ''
+            });
+            setError(null);
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+        >
+          Submit Another Request
+        </button>
       </div>
     );
   }
