@@ -70,8 +70,6 @@ export async function POST(request: NextRequest) {
       // Run tracking in background without awaiting
       trackStudyAbroadLead({
         name: fullName,
-        firstName: firstName,
-        lastName: lastName,
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
         country: body.country || 'Not specified',
