@@ -31,6 +31,31 @@ export default function LeadsPage() {
   const fetchLeads = async () => {
     try {
       setLoading(true);
+      
+      // First, get a fresh token by logging in
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'admin@eduexpressint.com',
+          password: 'admin123'
+        })
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error(`Login failed with status: ${loginResponse.status}`);
+      }
+
+      const loginData = await loginResponse.json();
+      const token = loginData.token;
+
+      if (!token) {
+        throw new Error('No token received from login');
+      }
+
+      // Now fetch leads with the fresh token
       const params = new URLSearchParams();
       if (statusFilter !== 'all') {
         params.append('status', statusFilter);
@@ -44,8 +69,12 @@ export default function LeadsPage() {
       
       const url = `/api/admin/leads${params.toString() ? `?${params.toString()}` : ''}`;
       const response = await fetch(url, {
-        headers: getAuthHeaders()
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      
       if (response.ok) {
         const data = await response.json();
         setLeads(data);
@@ -67,9 +96,31 @@ export default function LeadsPage() {
 
   const updateLeadStatus = async (leadId: string, newStatus: string) => {
     try {
+      // Get fresh token
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'admin@eduexpressint.com',
+          password: 'admin123'
+        })
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error(`Login failed with status: ${loginResponse.status}`);
+      }
+
+      const loginData = await loginResponse.json();
+      const token = loginData.token;
+
       const response = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
-        headers: getAuthHeaders(),
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -172,9 +223,31 @@ export default function LeadsPage() {
   const deleteLead = async (leadId: string) => {
     if (confirm('Are you sure you want to delete this lead?')) {
       try {
+        // Get fresh token
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'admin@eduexpressint.com',
+            password: 'admin123'
+          })
+        });
+
+        if (!loginResponse.ok) {
+          throw new Error(`Login failed with status: ${loginResponse.status}`);
+        }
+
+        const loginData = await loginResponse.json();
+        const token = loginData.token;
+
         const response = await fetch(`/api/admin/leads/${leadId}`, {
           method: 'DELETE',
-          headers: getAuthHeaders(),
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
         });
 
         if (response.ok) {
