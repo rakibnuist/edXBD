@@ -37,11 +37,14 @@ export default function LeadsPageNew() {
       
       // Get token from localStorage (set by AuthContext)
       const token = localStorage.getItem('admin_token');
+      console.log('Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'No token found');
       
       if (!token) {
         throw new Error('No authentication token found. Please login again.');
       }
 
+      console.log('Making request to /api/admin/leads with token...');
+      
       // Fetch leads with the existing token
       const response = await fetch('/api/admin/leads', {
         headers: {
@@ -49,6 +52,8 @@ export default function LeadsPageNew() {
           'Content-Type': 'application/json'
         }
       });
+      
+      console.log('Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
@@ -68,17 +73,23 @@ export default function LeadsPageNew() {
           })
         });
 
+        console.log('Login response status:', loginResponse.status);
+
         if (loginResponse.ok) {
           const loginData = await loginResponse.json();
+          console.log('New token received:', loginData.token ? `${loginData.token.substring(0, 20)}...` : 'No token');
           localStorage.setItem('admin_token', loginData.token);
           
           // Retry with new token
+          console.log('Retrying with new token...');
           const retryResponse = await fetch('/api/admin/leads', {
             headers: {
               'Authorization': `Bearer ${loginData.token}`,
               'Content-Type': 'application/json'
             }
           });
+          
+          console.log('Retry response status:', retryResponse.status);
           
           if (retryResponse.ok) {
             const data = await retryResponse.json();
