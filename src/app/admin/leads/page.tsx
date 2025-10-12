@@ -35,30 +35,14 @@ export default function LeadsPageNew() {
       setLoading(true);
       setError(null);
       
-      // First, get a fresh token by logging in
-      const loginResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: 'admin@eduexpressint.com',
-          password: 'admin123'
-        })
-      });
-
-      if (!loginResponse.ok) {
-        throw new Error(`Login failed with status: ${loginResponse.status}`);
-      }
-
-      const loginData = await loginResponse.json();
-      const token = loginData.token;
-
+      // Get token from localStorage (set by AuthContext)
+      const token = localStorage.getItem('admin_token');
+      
       if (!token) {
-        throw new Error('No token received from login');
+        throw new Error('No authentication token found. Please login again.');
       }
 
-      // Now fetch leads with the fresh token
+      // Fetch leads with the existing token
       const response = await fetch('/api/admin/leads', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -70,6 +54,42 @@ export default function LeadsPageNew() {
         const data = await response.json();
         console.log('Leads fetched:', data);
         setLeads(data);
+      } else if (response.status === 401 || response.status === 403) {
+        // Token expired or invalid, try to refresh by logging in again
+        console.log('Token expired, refreshing...');
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'admin@eduexpressint.com',
+            password: 'admin123'
+          })
+        });
+
+        if (loginResponse.ok) {
+          const loginData = await loginResponse.json();
+          localStorage.setItem('admin_token', loginData.token);
+          
+          // Retry with new token
+          const retryResponse = await fetch('/api/admin/leads', {
+            headers: {
+              'Authorization': `Bearer ${loginData.token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (retryResponse.ok) {
+            const data = await retryResponse.json();
+            console.log('Leads fetched with refreshed token:', data);
+            setLeads(data);
+          } else {
+            throw new Error(`HTTP error after token refresh! status: ${retryResponse.status}`);
+          }
+        } else {
+          throw new Error(`Token refresh failed with status: ${loginResponse.status}`);
+        }
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -84,24 +104,12 @@ export default function LeadsPageNew() {
 
   const updateLeadStatus = async (leadId: string, newStatus: string) => {
     try {
-      // Get fresh token
-      const loginResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: 'admin@eduexpressint.com',
-          password: 'admin123'
-        })
-      });
-
-      if (!loginResponse.ok) {
-        throw new Error(`Login failed with status: ${loginResponse.status}`);
+      // Get token from localStorage
+      const token = localStorage.getItem('admin_token');
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
       }
-
-      const loginData = await loginResponse.json();
-      const token = loginData.token;
 
       const response = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
@@ -127,6 +135,54 @@ export default function LeadsPageNew() {
         }
         
         setError(null);
+      } else if (response.status === 401 || response.status === 403) {
+        // Token expired, try to refresh
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'admin@eduexpressint.com',
+            password: 'admin123'
+          })
+        });
+
+        if (loginResponse.ok) {
+          const loginData = await loginResponse.json();
+          localStorage.setItem('admin_token', loginData.token);
+          
+          // Retry with new token
+          const retryResponse = await fetch(`/api/admin/leads/${leadId}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${loginData.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus }),
+          });
+          
+          if (retryResponse.ok) {
+            // Update local state
+            setLeads(prevLeads => 
+              prevLeads.map(lead => 
+                lead._id === leadId 
+                  ? { ...lead, status: newStatus, updatedAt: new Date().toISOString() }
+                  : lead
+              )
+            );
+            
+            if (selectedLead && selectedLead._id === leadId) {
+              setSelectedLead(prev => prev ? { ...prev, status: newStatus, updatedAt: new Date().toISOString() } : null);
+            }
+            
+            setError(null);
+          } else {
+            throw new Error(`Failed to update lead status after token refresh: ${retryResponse.status}`);
+          }
+        } else {
+          throw new Error(`Token refresh failed: ${loginResponse.status}`);
+        }
       } else {
         throw new Error(`Failed to update lead status: ${response.status}`);
       }
