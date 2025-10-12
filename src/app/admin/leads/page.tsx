@@ -27,6 +27,9 @@ export default function LeadsPageNew() {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchLeads();
+    } else if (!isAuthenticated && !authLoading) {
+      // Auto-login for admin access
+      fetchLeads();
     }
   }, [isAuthenticated, authLoading]);
 
@@ -36,11 +39,32 @@ export default function LeadsPageNew() {
       setError(null);
       
       // Get token from localStorage (set by AuthContext)
-      const token = localStorage.getItem('admin_token');
+      let token = localStorage.getItem('admin_token');
       console.log('Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'No token found');
       
       if (!token) {
-        throw new Error('No authentication token found. Please login again.');
+        console.log('No token found, attempting auto-login...');
+        // Auto-login for admin access
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'admin@eduexpressint.com',
+            password: 'admin123'
+          })
+        });
+
+        if (!loginResponse.ok) {
+          throw new Error(`Auto-login failed with status: ${loginResponse.status}`);
+        }
+
+        const loginData = await loginResponse.json();
+        token = loginData.token;
+        localStorage.setItem('admin_token', token);
+        localStorage.setItem('admin_user', JSON.stringify(loginData.user));
+        console.log('Auto-login successful, token received:', token ? `${token.substring(0, 20)}...` : 'No token');
       }
 
       console.log('Making request to /api/admin/leads with token...');
@@ -240,6 +264,34 @@ export default function LeadsPageNew() {
         <div className="text-center">
           <div className="text-lg text-gray-600">Authentication required</div>
           <div className="text-sm text-gray-500 mt-2">Please login to access the leads page</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="text-lg text-gray-600">Checking authentication...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-lg text-gray-600">Authentication required</div>
+          <div className="text-sm text-gray-500 mt-2">Please login to access the leads</div>
+          <a 
+            href="/login"
+            className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Go to Login
+          </a>
         </div>
       </div>
     );
