@@ -7,7 +7,11 @@ export async function GET(request: NextRequest) {
   try {
     const decoded = verifyTokenFromRequest(request);
     
+    console.log('Leads API - Token verification result:', decoded);
+    console.log('Leads API - Request headers:', Object.fromEntries(request.headers.entries()));
+    
     if (!decoded || decoded.role !== 'admin') {
+      console.log('Leads API - Authentication failed:', { decoded, role: decoded?.role });
       return NextResponse.json({ message: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 
@@ -32,6 +36,10 @@ export async function GET(request: NextRequest) {
     const leads = await Lead.find(query)
       .sort({ createdAt: -1 })
       .limit(100);
+
+    console.log(`Found ${leads.length} leads in database`);
+    console.log('Query used:', query);
+    console.log('Sample lead:', leads[0] ? { id: leads[0]._id, name: leads[0].name, email: leads[0].email } : 'No leads found');
 
     return NextResponse.json(leads);
   } catch (error) {
