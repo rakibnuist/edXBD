@@ -1,3 +1,6 @@
+const fs = require('fs');
+
+const content = `
 'use client';
 
 import { motion } from 'framer-motion';
@@ -114,33 +117,14 @@ const UniversityDetailClient = ({ initialData }: UniversityDetailClientProps) =>
                                                     const parts = badge.split(':');
                                                     const label = parts[0]?.trim();
                                                     const value = parts[1]?.trim() || '';
-
-                                                    let logoUrl = null;
-                                                    const lLabel = label.toLowerCase();
-                                                    if (lLabel.includes('qs')) {
-                                                        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/QS_World_University_Rankings_logo.svg/200px-QS_World_University_Rankings_logo.svg.png';
-                                                    } else if (lLabel.includes('us news') || lLabel.includes('u.s. news')) {
-                                                        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/U.S._News_%26_World_Report_logo.svg/200px-U.S._News_%26_World_Report_logo.svg.png';
-                                                    } else if (lLabel.includes('shanghai') || lLabel.includes('arwu')) {
-                                                        logoUrl = 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/ShanghaiRanking_logo.svg/200px-ShanghaiRanking_logo.svg.png';
-                                                    } else if (lLabel.includes('times') || lLabel.includes('the')) {
-                                                        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Times_Higher_Education_logo.svg/200px-Times_Higher_Education_logo.svg.png';
-                                                    }
-
                                                     return (
-                                                        <div key={`rank-${i}`} className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 backdrop-blur-md border border-amber-400/20 rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-amber-900/20 hover:border-amber-400/40 transition-colors group">
-                                                            {logoUrl ? (
-                                                                <div className="w-10 h-10 bg-white/95 shadow-inner border border-white/20 rounded-full flex items-center justify-center p-1.5 overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform">
-                                                                    <img src={logoUrl} alt={label} className="w-full h-full object-contain" />
-                                                                </div>
-                                                            ) : (
-                                                                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300 flex-shrink-0">
-                                                                    <Trophy className="w-4 h-4" />
-                                                                </div>
-                                                            )}
+                                                        <div key={\`rank-\${i}\`} className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 backdrop-blur-md border border-amber-400/20 rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg shadow-amber-900/20 hover:border-amber-400/40 transition-colors">
+                                                            <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300">
+                                                                <Trophy className="w-4 h-4" />
+                                                            </div>
                                                             <div>
                                                                 <p className="text-[10px] text-amber-200/70 uppercase font-bold tracking-wider">{label}</p>
-                                                                <p className="text-white font-black text-lg leading-tight">{value.startsWith('#') ? value : `#${value}`}</p>
+                                                                <p className="text-white font-black text-lg leading-tight">{value.startsWith('#') ? value : \`#\${value}\`}</p>
                                                             </div>
                                                         </div>
                                                     );
@@ -150,8 +134,21 @@ const UniversityDetailClient = ({ initialData }: UniversityDetailClientProps) =>
                                         </div>
                                     </div>
                                 )}
-
-
+                                
+                                {/* Base Stats */}
+                                <div className="flex gap-3 pt-2">
+                                    {uni.details?.tuition && (
+                                        <div className="bg-white/5 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 flex items-center gap-3 hover:bg-white/10 transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300">
+                                                <Wallet className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Tuition</p>
+                                                <p className="text-white font-bold">{uni.details.tuition.split(' ')[0]}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -169,7 +166,7 @@ const UniversityDetailClient = ({ initialData }: UniversityDetailClientProps) =>
                                     <div className="relative bg-white border border-slate-100 p-8 rounded-[2rem] shadow-2xl w-[260px] h-[260px] md:w-[320px] md:h-[320px] flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
                                         <img
                                             src={uni.logo}
-                                            alt={`${uni.name} logo`}
+                                            alt={\`\${uni.name} logo\`}
                                             className="w-full h-full object-contain filter hover:brightness-105 transition-all drop-shadow-sm"
                                         />
                                     </div>
@@ -579,3 +576,7 @@ const UniversityDetailClient = ({ initialData }: UniversityDetailClientProps) =>
 };
 
 export default UniversityDetailClient;
+`;
+
+fs.writeFileSync('src/app/partnership/universities/[id]/UniversityDetailClient.tsx', content);
+
